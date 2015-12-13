@@ -27,6 +27,11 @@ public class EarthquakeAdapter extends ArrayAdapter<Earthquake> {
     }
 
     @Override
+    public Earthquake getItem(int position) {
+        return earthquakes.get(position);
+    }
+
+    @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         final Earthquake earthquake = earthquakes.get(position);
         final EarthquakeViewHolder holder;
