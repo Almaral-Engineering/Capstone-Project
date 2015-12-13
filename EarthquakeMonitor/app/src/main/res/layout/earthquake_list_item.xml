@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingTop="16dp"
+    android:paddingTop="@dimen/earthquake_list_item_vertical_padding"
     android:paddingBottom="16dp"
     android:orientation="horizontal">
 
@@ -13,7 +13,7 @@
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="2"
-        android:padding="6dp"
+        android:padding="@dimen/earthquake_list_item_padding"
         android:textStyle="bold"
         android:gravity="center"
         android:fontFamily="sans-serif-condensed"
@@ -37,7 +37,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:padding="6dp"
+                android:padding="@dimen/earthquake_list_item_padding"
                 android:fontFamily="sans-serif-condensed"
                 android:textSize="18sp"
                 tools:text="5 km N of Los Angeles, CA"/>
@@ -53,7 +53,7 @@
             android:id="@+id/earthquake_list_item_distance_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="6dp"
+            android:padding="@dimen/earthquake_list_item_padding"
             android:fontFamily="sans-serif-light"
             android:visibility="gone"
             tools:text="Distance: 20 Km"/>

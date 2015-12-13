@@ -8,7 +8,7 @@
     tools:context=".MainActivity">
 
     <android.support.v7.widget.Toolbar
-        android:id="@+id/main_activity_toolbar"
+        android:id="@+id/earthquake_list_activity_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?attr/colorPrimary"
@@ -20,7 +20,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:divider="@android:drawable/divider_horizontal_bright"
-        android:dividerHeight="1dp"
-        android:padding="16dp"/>
+        android:dividerHeight="@dimen/activity_earthquake_list_divider_height"
+        android:padding="@dimen/activity_earthquake_list_padding"/>
 
 </LinearLayout>

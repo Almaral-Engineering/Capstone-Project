@@ -1,4 +1,4 @@
-package com.almareng.earthquakemonitor;
+package com.almareng.earthquakemonitor.EqListScreen;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -7,21 +7,20 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
 
-import com.almareng.earthquakemonitor.EqListScreen.Earthquake;
-import com.almareng.earthquakemonitor.EqListScreen.EarthquakeAdapter;
+import com.almareng.earthquakemonitor.R;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity {
+public class EarthquakeListActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_earthquake_list);
 
-        final Toolbar mainToolbar = (Toolbar) findViewById(R.id.main_activity_toolbar);
+        final Toolbar mainToolbar = (Toolbar) findViewById(R.id.earthquake_list_activity_toolbar);
 
-        mainToolbar.setTitle("Earthquake Monitor");
+        mainToolbar.setTitle(getString(R.string.app_name));
         setSupportActionBar(mainToolbar);
 
         final ListView earthquakeList = (ListView) findViewById(R.id.earthquake_list);
