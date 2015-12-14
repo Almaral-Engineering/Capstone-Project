@@ -11,8 +11,8 @@ public class Earthquake implements Parcelable {
     private final String mLongitude;
     private final String mDepth;
 
-    public Earthquake(String mMagnitude, String mPlace, String mTimeAndDate, String mLatitude, String mLongitude,
-                      String mDepth) {
+    public Earthquake(final String mMagnitude, final String mPlace, final String mTimeAndDate, final String mLongitude,
+                      final String mLatitude, final String mDepth) {
         this.mMagnitude = mMagnitude;
         this.mPlace = mPlace;
         this.mTimeAndDate = mTimeAndDate;

@@ -12,11 +12,15 @@ import android.widget.ListView;
 
 import com.almareng.earthquakemonitor.DetailScreen.DetailActivity;
 import com.almareng.earthquakemonitor.R;
+import com.almareng.earthquakemonitor.api.ApiClient;
 
 import java.util.ArrayList;
 
 public class EarthquakeListActivity extends AppCompatActivity {
     public static final String EARTHQUAKE_KEY = "earthquake";
+
+    private EarthquakeAdapter earthquakeAdapter;
+    private ArrayList<Earthquake> earthquakes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,12 +33,12 @@ public class EarthquakeListActivity extends AppCompatActivity {
         setSupportActionBar(mainToolbar);
 
         final ListView earthquakeList = (ListView) findViewById(R.id.earthquake_list);
-        final ArrayList<Earthquake> earthquakes = new ArrayList<>();
+        earthquakes = new ArrayList<>();
 
-        earthquakes.add(new Earthquake("5.0", "5 km NW of Los Angeles, California", "1450038310130", "-149.8008", "61.5592", "54.6"));
-        earthquakes.add(new Earthquake("2.3", "100 km E of Honolulu, Hawaii", "1450036311000", "-122.8130035", "38.8069992", "0.59"));
+//        earthquakes.add(new Earthquake("5.0", "5 km NW of Los Angeles, California", "1450038310130", "-149.8008", "61.5592", "54.6"));
+//        earthquakes.add(new Earthquake("2.3", "100 km E of Honolulu, Hawaii", "1450036311000", "-122.8130035", "38.8069992", "0.59"));
 
-        final EarthquakeAdapter earthquakeAdapter = new EarthquakeAdapter(this, earthquakes);
+        earthquakeAdapter = new EarthquakeAdapter(this, earthquakes);
 
         earthquakeList.setAdapter(earthquakeAdapter);
         earthquakeList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -47,6 +51,27 @@ public class EarthquakeListActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        fetchEarthquakeData();
+    }
+
+    private void fetchEarthquakeData() {
+        ApiClient.getEarthquakeLastHour(this, new EarthquakeLastHourListener() {
+            @Override
+            public void onResponse(final ArrayList<Earthquake> earthquakes) {
+                setEarthquakes(earthquakes);
+            }
+
+            @Override
+            public void onErrorResponse(final Exception error) {
+
+            }
+        });
+    }
+
+    public void setEarthquakes(final ArrayList<Earthquake> earthquakes) {
+        this.earthquakes.addAll(earthquakes);
+        earthquakeAdapter.notifyDataSetChanged();
     }
 
     @Override
