@@ -5,4 +5,5 @@
     <string name="fragment_detail_location">Location:</string>
     <string name="earthquake_detail_date_format">dd MMM yyyy</string>
     <string name="earthquake_detail_time_format">HH:mm:ss</string>
+    <string name="activity_detail_map_epicenter">Epicenter</string>
 </resources>

@@ -6,9 +6,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.almareng.earthquakemonitor.R;
 import com.almareng.earthquakemonitor.list.Earthquake;
 import com.almareng.earthquakemonitor.list.EarthquakeListActivity;
-import com.almareng.earthquakemonitor.R;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 public class DetailActivity extends AppCompatActivity {
 
@@ -23,6 +29,37 @@ public class DetailActivity extends AppCompatActivity {
         final DetailFragment detailFragment = (DetailFragment) fragmentManager.findFragmentById(R.id.fragment_detail);
 
         detailFragment.setupViews(earthquake);
+
+        setupMap(earthquake);
+    }
+
+    private void setupMap(final Earthquake earthquake) {
+        final GoogleMap map = ((MapFragment) getFragmentManager().findFragmentById(R.id.activity_detail_map)).getMap();
+        final LatLng eqLocation = new LatLng(Double.parseDouble(earthquake.getLatitude()),
+                                             Double.parseDouble(earthquake.getLongitude()));
+
+        map.setMyLocationEnabled(true);
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(eqLocation, 7));
+
+        final String earthquakeMagnitude = earthquake.getMagnitude();
+        final Double magnitude = Double.parseDouble(earthquakeMagnitude);
+
+        float hueColor;
+
+        if(magnitude >= 0 && magnitude <= 0.9){
+            hueColor = BitmapDescriptorFactory.HUE_GREEN;
+        }
+        else if(magnitude >= 9.0 && magnitude <= 9.9){
+            hueColor = BitmapDescriptorFactory.HUE_RED;
+        }
+        else{
+            hueColor = BitmapDescriptorFactory.HUE_BLUE;
+        }
+
+        map.addMarker(new MarkerOptions()
+                              .title(getString(R.string.activity_detail_map_epicenter))
+                              .position(eqLocation)
+                              .icon(BitmapDescriptorFactory.defaultMarker(hueColor)));
     }
 
     @Override
