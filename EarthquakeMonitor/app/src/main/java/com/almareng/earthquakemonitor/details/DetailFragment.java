@@ -1,4 +1,4 @@
-package com.almareng.earthquakemonitor.DetailScreen;
+package com.almareng.earthquakemonitor.details;
 
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -7,7 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.almareng.earthquakemonitor.EqListScreen.Earthquake;
+import com.almareng.earthquakemonitor.list.Earthquake;
 import com.almareng.earthquakemonitor.R;
 
 import java.text.SimpleDateFormat;

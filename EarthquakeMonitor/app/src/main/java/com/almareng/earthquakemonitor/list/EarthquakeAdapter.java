@@ -1,4 +1,4 @@
-package com.almareng.earthquakemonitor.EqListScreen;
+package com.almareng.earthquakemonitor.list;
 
 import android.content.Context;
 import android.view.LayoutInflater;

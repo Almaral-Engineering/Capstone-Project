@@ -1,4 +1,4 @@
-package com.almareng.earthquakemonitor.EqListScreen;
+package com.almareng.earthquakemonitor.list;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,7 +10,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import com.almareng.earthquakemonitor.DetailScreen.DetailActivity;
+import com.almareng.earthquakemonitor.details.DetailActivity;
 import com.almareng.earthquakemonitor.R;
 import com.almareng.earthquakemonitor.api.ApiClient;
 

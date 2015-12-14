@@ -3,8 +3,8 @@ package com.almareng.earthquakemonitor.api;
 import android.content.Context;
 import android.util.Log;
 
-import com.almareng.earthquakemonitor.EqListScreen.Earthquake;
-import com.almareng.earthquakemonitor.EqListScreen.EarthquakeLastHourListener;
+import com.almareng.earthquakemonitor.list.Earthquake;
+import com.almareng.earthquakemonitor.list.EarthquakeLastHourListener;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;

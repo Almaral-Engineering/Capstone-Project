@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.almareng.earthquakemonitor.DetailScreen.DetailActivity">
+    tools:context="com.almareng.earthquakemonitor.details.DetailActivity">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/activity_detail_toolbar"
@@ -17,7 +17,7 @@
 
     <fragment
         android:id="@+id/fragment_detail"
-        android:name="com.almareng.earthquakemonitor.DetailScreen.DetailFragment"
+        android:name="com.almareng.earthquakemonitor.details.DetailFragment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"

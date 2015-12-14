@@ -1,4 +1,4 @@
-package com.almareng.earthquakemonitor.DetailScreen;
+package com.almareng.earthquakemonitor.details;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
@@ -6,8 +6,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.almareng.earthquakemonitor.EqListScreen.Earthquake;
-import com.almareng.earthquakemonitor.EqListScreen.EarthquakeListActivity;
+import com.almareng.earthquakemonitor.list.Earthquake;
+import com.almareng.earthquakemonitor.list.EarthquakeListActivity;
 import com.almareng.earthquakemonitor.R;
 
 public class DetailActivity extends AppCompatActivity {

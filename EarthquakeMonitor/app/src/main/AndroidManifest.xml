@@ -14,7 +14,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".EqListScreen.EarthquakeListActivity"
+            android:name=".list.EarthquakeListActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -23,7 +23,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".DetailScreen.DetailActivity" >
+            android:name=".details.DetailActivity" >
         </activity>
 
         <meta-data
