@@ -17,6 +17,9 @@ import java.util.ArrayList;
 public final class EarthquakeListFragment extends Fragment {
     private static final String EARTHQUAKE_LIST_KEY = "earthquake_list";
 
+    private ArrayList<Earthquake> earthquakes;
+    private EarthquakeAdapter earthquakeAdapter;
+
     public static EarthquakeListFragment newInstance(final ArrayList<Earthquake> earthquakes) {
 
         final Bundle args = new Bundle();
@@ -39,8 +42,8 @@ public final class EarthquakeListFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         final ListView earthquakeList = (ListView) view.findViewById(R.id.earthquake_list);
-        final ArrayList<Earthquake> earthquakes = getArguments().getParcelableArrayList(EARTHQUAKE_LIST_KEY);
-        final EarthquakeAdapter earthquakeAdapter = new EarthquakeAdapter(getActivity(), earthquakes);
+        earthquakes = getArguments().getParcelableArrayList(EARTHQUAKE_LIST_KEY);
+        earthquakeAdapter = new EarthquakeAdapter(getActivity(), earthquakes);
 
         earthquakeList.setAdapter(earthquakeAdapter);
         earthquakeList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -53,5 +56,9 @@ public final class EarthquakeListFragment extends Fragment {
                 startActivity(intent);
             }
         });
+    }
+
+    public void reloadEarthquakes(final ArrayList<Earthquake> earthquakes) {
+        earthquakeAdapter.updateEarthquakeList(earthquakes);
     }
 }

@@ -4,7 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.almareng.earthquakemonitor.list.Earthquake;
-import com.almareng.earthquakemonitor.list.EarthquakeLastHourListener;
+import com.almareng.earthquakemonitor.list.EarthquakeDataListener;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -19,6 +19,11 @@ import java.util.ArrayList;
 public class ApiClient {
     private static final String BASE_URL = "http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/";
     private static final String LAST_HOUR_DATA = "all_hour.geojson";
+    private static final String LAST_DAY_DATA = "all_day.geojson";
+    private static final String LAST_WEEK_DATA = "all_week.geojson";
+    private static final String HOUR_PATH = "hour";
+    private static final String DAY_PATH = "day";
+    private static final String WEEK_PATH = "week";
 
     private static final String FEATURES= "features";
     private static final String PROPERTIES = "properties";
@@ -28,10 +33,23 @@ public class ApiClient {
     private static final String PLACE = "place";
     private static final String TIME_DATE = "time";
 
-    public static void getEarthquakeLastHour(final Context context, final EarthquakeLastHourListener listener) {
-        final String url = BASE_URL + LAST_HOUR_DATA;
+    public static void getEarthquakeData(final Context context, String url, final EarthquakeDataListener listener) {
+        switch (url) {
+            case "hour":
+                url = LAST_HOUR_DATA;
+                break;
+            case "day":
+                url = LAST_DAY_DATA;
+                break;
+            case "week":
+                url = LAST_WEEK_DATA;
+                break;
+        }
+
+        final String path = BASE_URL + url;
+        Log.d("MANZANA", path);
         final JsonObjectRequest jsonObjectRequest;
-        jsonObjectRequest = new JsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
+        jsonObjectRequest = new JsonObjectRequest(path, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(final JSONObject response) {
                 final ArrayList<Earthquake> earthquakes = parseJsonToEarthquake(response);
@@ -53,7 +71,6 @@ public class ApiClient {
     }
 
     private static ArrayList<Earthquake> parseJsonToEarthquake(final JSONObject jsonObject) {
-        Log.d("MANZANA", jsonObject.toString());
         final ArrayList<Earthquake> earthquakes = new ArrayList<>();
         final JSONArray features;
 
@@ -63,8 +80,6 @@ public class ApiClient {
             e.printStackTrace();
             return null;
         }
-
-        Log.d("FEATURES", features.toString());
 
         for (int i = 0; i < features.length(); i++) {
             final String magnitude;

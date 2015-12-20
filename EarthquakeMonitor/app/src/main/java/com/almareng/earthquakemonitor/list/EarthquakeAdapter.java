@@ -10,6 +10,7 @@ import android.widget.TextView;
 import com.almareng.earthquakemonitor.R;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class EarthquakeAdapter extends ArrayAdapter<Earthquake> {
     private final Context context;
@@ -48,6 +49,12 @@ public class EarthquakeAdapter extends ArrayAdapter<Earthquake> {
         holder.placeText.setText(earthquake.getPlace());
 
         return convertView;
+    }
+
+    public void updateEarthquakeList(final List<Earthquake> earthquakes) {
+        this.earthquakes.clear();
+        this.earthquakes.addAll(earthquakes);
+        this.notifyDataSetChanged();
     }
 
     private class EarthquakeViewHolder {
