@@ -1,4 +1,4 @@
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -15,12 +15,10 @@
         android:minHeight="?attr/actionBarSize"
         app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"/>
 
-    <ListView
-        android:id="@+id/earthquake_list"
+    <FrameLayout
+        android:id="@+id/main_frame_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:divider="@android:drawable/divider_horizontal_bright"
-        android:dividerHeight="@dimen/activity_earthquake_list_divider_height"
-        android:padding="@dimen/activity_earthquake_list_padding"/>
+        android:layout_height="match_parent"
+        android:layout_below="@id/earthquake_list_activity_toolbar"/>
 
-</LinearLayout>
+</RelativeLayout>

@@ -1,65 +1,76 @@
 package com.almareng.earthquakemonitor.list;
 
+import android.app.FragmentTransaction;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.location.Location;
 import android.os.Bundle;
+import android.preference.ListPreference;
+import android.preference.Preference;
+import android.preference.PreferenceFragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
+import android.widget.RelativeLayout;
 
-import com.almareng.earthquakemonitor.details.DetailActivity;
 import com.almareng.earthquakemonitor.R;
 import com.almareng.earthquakemonitor.api.ApiClient;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 
 import java.util.ArrayList;
 
-public class EarthquakeListActivity extends AppCompatActivity {
+public class EarthquakeListActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener {
     public static final String EARTHQUAKE_KEY = "earthquake";
 
-    private EarthquakeAdapter earthquakeAdapter;
-    private ArrayList<Earthquake> earthquakes;
+    private static final String PREFERENCE_LONGITUDE = "pref_lon";
+    private static final String PREFERENCE_LATITUDE = "pref_lat";
+    private static final String LOCATION_PREFERENCES = "location_pref";
+
+    private SettingsFragment settingsFragment;
+    private RelativeLayout loadingPanel;
+    private GoogleApiClient mGoogleApiClient;
+    private Location mCurrentLocation;
+    private boolean showGpsPrompt = false;
+    private Toolbar toolbar;
+    private EarthquakeListFragment earthquakeListFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_earthquake_list);
 
-        final Toolbar mainToolbar = (Toolbar) findViewById(R.id.earthquake_list_activity_toolbar);
-
-        mainToolbar.setTitle(getString(R.string.app_name));
-        setSupportActionBar(mainToolbar);
-
-        final ListView earthquakeList = (ListView) findViewById(R.id.earthquake_list);
-        earthquakes = new ArrayList<>();
-
-//        earthquakes.add(new Earthquake("5.0", "5 km NW of Los Angeles, California", "1450038310130", "-149.8008", "61.5592", "54.6"));
-//        earthquakes.add(new Earthquake("2.3", "100 km E of Honolulu, Hawaii", "1450036311000", "-122.8130035", "38.8069992", "0.59"));
-
-        earthquakeAdapter = new EarthquakeAdapter(this, earthquakes);
-
-        earthquakeList.setAdapter(earthquakeAdapter);
-        earthquakeList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                final Earthquake chosenEarthquake = earthquakeAdapter.getItem(position);
-
-                final Intent intent = new Intent(EarthquakeListActivity.this, DetailActivity.class);
-                intent.putExtra(EARTHQUAKE_KEY, chosenEarthquake);
-                startActivity(intent);
-            }
-        });
-
+        setupToolbar();
         fetchEarthquakeData();
+        inflateMenu();
+
+        mGoogleApiClient =  new GoogleApiClient.Builder(this)
+                .addApi(LocationServices.API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .build();
+
+        mGoogleApiClient.connect();
+
+        settingsFragment = new SettingsFragment();
     }
 
     private void fetchEarthquakeData() {
         ApiClient.getEarthquakeLastHour(this, new EarthquakeLastHourListener() {
             @Override
             public void onResponse(final ArrayList<Earthquake> earthquakes) {
-                setEarthquakes(earthquakes);
+                earthquakeListFragment = EarthquakeListFragment.newInstance(earthquakes);
+                FragmentTransaction transaction = getFragmentManager().beginTransaction();
+
+                transaction.add(R.id.main_frame_layout, earthquakeListFragment);
+                transaction.addToBackStack(null);
+                transaction.commit();
             }
 
             @Override
@@ -69,30 +80,207 @@ public class EarthquakeListActivity extends AppCompatActivity {
         });
     }
 
-    public void setEarthquakes(final ArrayList<Earthquake> earthquakes) {
-        this.earthquakes.addAll(earthquakes);
-        earthquakeAdapter.notifyDataSetChanged();
+    @Override
+    public void onBackPressed() {
+        if (toolbar.getTitle().equals(getString(R.string.title_activity_settings))) {
+            toolbar.getMenu().clear();
+            toolbar.setNavigationIcon(null);
+            toolbar.inflateMenu(R.menu.menu_main);
+            toolbar.setTitle(getString(R.string.app_name));
+
+            getFragmentManager().popBackStackImmediate();
+        } else {
+            super.onBackPressed();
+        }
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
+    public boolean onOptionsItemSelected(final MenuItem item) {
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if(id == R.id.action_settings) {
+            final FragmentTransaction transaction = getFragmentManager().beginTransaction();
+
+            transaction.replace(R.id.main_frame_layout, settingsFragment);
+            transaction.addToBackStack(null);
+            transaction.commit();
+            toolbar.setTitle(getString(R.string.title_activity_settings));
+
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onConnected(final Bundle bundle) {
+        mCurrentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+
+        if(mCurrentLocation == null) {
+            if(showGpsPrompt) {
+                showGpsPrompt = false;
+                showPromptActivateGPS();
+            }
+        } else {
+            String longitudeString = String.valueOf(mCurrentLocation.getLongitude());
+            String latitudeString = String.valueOf(mCurrentLocation.getLatitude());
+            SharedPreferences locationPreference = getSharedPreferences(LOCATION_PREFERENCES, 0);
+            SharedPreferences.Editor editor = locationPreference.edit();
+
+            editor.putString(PREFERENCE_LONGITUDE, longitudeString);
+            editor.putString(PREFERENCE_LATITUDE, latitudeString);
+            editor.apply();
+
+            if(showGpsPrompt) {
+                fetchEarthquakeData();
+            }
+        }
+
+        if(mGoogleApiClient.isConnected()) {
+            mGoogleApiClient.disconnect();
+        }
+    }
+
+    @Override
+    public void onConnectionSuspended(final int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(final ConnectionResult connectionResult) {
+
+    }
+
+    private void setupToolbar() {
+        toolbar = (Toolbar) findViewById(R.id.earthquake_list_activity_toolbar);
+
+        toolbar.setTitle(getString(R.string.app_name));
+        setSupportActionBar(toolbar);
+    }
+
+    private void showPromptActivateGPS() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setPositiveButton(R.string.enable_gps, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(final DialogInterface dialog, int which) {
+                Intent gpsOptionsIntent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                startActivity(gpsOptionsIntent);
+            }
+        });
+
+        builder.setNegativeButton(android.R.string.cancel, null);
+        builder.setMessage(getString(R.string.gps_needed));
+
+        AlertDialog noInternetDialog = builder.create();
+
+        noInternetDialog.show();
+    }
+
+    private void connectToGoogleApiClient(){
+        if(mGoogleApiClient != null) {
+            showGpsPrompt = true;
+            mGoogleApiClient.connect();
+        }
+    }
+
+    private void inflateMenu() {
+
+        toolbar.inflateMenu(R.menu.menu_main);
+
+        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(final MenuItem item) {
+                int id = item.getItemId();
+
+                if (id == R.id.action_settings) {
+                    final FragmentTransaction transaction = getFragmentManager().beginTransaction();
+
+                    transaction.replace(R.id.main_frame_layout, settingsFragment);
+                    transaction.addToBackStack(null);
+                    transaction.commit();
+                    toolbar.setTitle(getString(R.string.title_activity_settings));
+                    toolbar.getMenu().clear();
+                    toolbar.setNavigationIcon(R.drawable.ic_action_back);
+                    toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(final View v) {
+                            onBackPressed();
+                        }
+                    });
+
+                    return true;
+                }
+
+                return true;
+            }
+        });
+    }
+
+    private boolean isLocationNull(){
+        return mCurrentLocation == null;
+    }
+
+    public static class SettingsFragment extends PreferenceFragment implements Preference.OnPreferenceChangeListener {
+
+        @Override
+        public void onCreate(final Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+
+            addPreferencesFromResource(R.xml.preferences);
+
+            bindPreferenceToValue(findPreference(getString(R.string.searching_time_key)));
+            bindPreferenceToValue(findPreference(getString(R.string.magnitude_pref_key)));
+            bindPreferenceToValue(findPreference(getString(R.string.searching_distance_key)));
+        }
+
+        @Override
+        public boolean onPreferenceChange(final Preference preference, final Object value) {
+            final String stringValue = value.toString();
+
+            if (preference instanceof ListPreference) {
+                if (preference.getKey().equals(getString(R.string.searching_distance_key))) {
+                    if (!((EarthquakeListActivity) getActivity()).isLocationNull()) {
+                        final ListPreference listPreference = (ListPreference) preference;
+                        final int prefIndex = listPreference.findIndexOfValue(stringValue);
+
+                        if (prefIndex >= 0) {
+                            preference.setSummary(listPreference.getEntries()[prefIndex]);
+                        }
+                    }
+
+                    ((EarthquakeListActivity) getActivity()).connectToGoogleApiClient();
+                } else {
+                    final ListPreference listPreference = (ListPreference) preference;
+                    final int prefIndex = listPreference.findIndexOfValue(stringValue);
+                    if (prefIndex >= 0) {
+                        preference.setSummary(listPreference.getEntries()[prefIndex]);
+                        ((EarthquakeListActivity) getActivity()).fetchEarthquakeData();
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        private void bindPreferenceToValue(final Preference preference) {
+            // Set the listener to watch for value changes.
+            preference.setOnPreferenceChangeListener(this);
+
+            if (preference instanceof ListPreference) {
+                // For list preferences, look up the correct display value in
+                // the preference's 'entries' list (since they have separate labels/values).
+                final ListPreference listPreference = (ListPreference) preference;
+                final int prefIndex = listPreference.findIndexOfValue(((ListPreference) preference).getValue());
+
+                preference.setSummary(listPreference.getEntries()[prefIndex]);
+            }
+        }
     }
 }

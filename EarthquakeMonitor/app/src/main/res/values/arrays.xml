@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="searching_time_options">
+        <item>@string/searching_time_last_hour_label</item>
+        <item>@string/searching_time_last_day_label</item>
+        <item>@string/searching_time_last_week_label</item>
+    </string-array>
+
+    <string-array name="searching_time_values">
+        <item>@string/searching_time_last_hour_value</item>
+        <item>@string/searching_time_last_day_value</item>
+        <item>@string/searching_time_last_week_value</item>
+    </string-array>
+
+    <string-array name="magnitude_pref_options">
+        <item>1.0</item>
+        <item>2.0</item>
+        <item>3.0</item>
+        <item>4.0</item>
+        <item>5.0</item>
+        <item>6.0</item>
+        <item>7.0</item>
+    </string-array>
+
+    <string-array name="magnitude_pref_values">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+    </string-array>
+
+    <string-array name="searching_distance_options">
+        <item>Near Me</item>
+        <item>500 km/310 mi away</item>
+        <item>1000 km/620 mi away</item>
+        <item>2000 km/1240 mi away</item>
+        <item>5000 km/3100 mi away</item>
+        <item>World</item>
+    </string-array>
+
+    <string-array name="searching_distance_values">
+        <item>200</item>
+        <item>500</item>
+        <item>1000</item>
+        <item>2000</item>
+        <item>5000</item>
+        <item>1000000</item>
+    </string-array>
+</resources>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <ListPreference
+        android:title="@string/searching_time_title"
+        android:key="@string/searching_time_key"
+        android:defaultValue="@string/searching_time_default"
+        android:entryValues="@array/searching_time_values"
+        android:entries="@array/searching_time_options" />
+
+    <ListPreference
+        android:title="@string/magnitude_pref_title"
+        android:key="@string/magnitude_pref_key"
+        android:defaultValue="@string/magnitude_pref_default"
+        android:entryValues="@array/magnitude_pref_values"
+        android:entries="@array/magnitude_pref_options" />
+
+    <ListPreference
+        android:title="@string/searching_distance_title"
+        android:key="@string/searching_distance_key"
+        android:defaultValue="@string/searching_distance_default"
+        android:entryValues="@array/searching_distance_values"
+        android:entries="@array/searching_distance_options" />
+</PreferenceScreen>

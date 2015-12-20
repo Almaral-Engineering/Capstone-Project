@@ -6,4 +6,26 @@
     <string name="earthquake_detail_date_format">dd MMM yyyy</string>
     <string name="earthquake_detail_time_format">HH:mm:ss</string>
     <string name="activity_detail_map_epicenter">Epicenter</string>
+    <string name="enable_gps">Enable</string>
+    <string name="gps_needed">You need enable GPS to see Earthquakes by distance, do you want to enable GPS?</string>
+
+    <!-- Settings Screen -->
+    <string name="searching_time_title">Searching Time</string>
+    <string name="searching_time_key">searching_time</string>
+    <string name="searching_time_default">hour</string>
+    <string name="searching_time_last_hour_label">This Hour</string>
+    <string name="searching_time_last_day_label">This Day</string>
+    <string name="searching_time_last_week_label">This Week</string>
+    <string name="searching_time_last_hour_value">hour</string>
+    <string name="searching_time_last_day_value">day</string>
+    <string name="searching_time_last_week_value">week</string>
+    <string name="magnitude_pref_title">Minimum Magnitude to Show</string>
+    <string name="magnitude_pref_key">minimum_magnitude</string>
+    <string name="magnitude_pref_default">2</string>
+    <string name="magnitude_out_of_range">You must insert a value between 1.0 and 7.0</string>
+    <string name="searching_distance_title">Searching Distance</string>
+    <string name="searching_distance_key">searching_distance</string>
+    <string name="searching_distance_default">1000000</string>
+    <string name="title_activity_settings">Settings</string>
+
 </resources>
