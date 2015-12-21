@@ -1,6 +1,7 @@
 package com.almareng.earthquakemonitor.list;
 
 import android.content.Context;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,8 +46,32 @@ public class EarthquakeAdapter extends ArrayAdapter<Earthquake> {
             holder = (EarthquakeViewHolder) convertView.getTag();
         }
 
-        holder.magnitudeText.setText(String.valueOf(earthquake.getMagnitude()));
+        final Double magnitude = earthquake.getMagnitude();
+
+        holder.magnitudeText.setText(String.valueOf(magnitude));
         holder.placeText.setText(earthquake.getPlace());
+
+        if(magnitude >= 0 && magnitude <= 3.5){
+            holder.magnitudeText.setTextColor(ContextCompat.getColor(context, android.R.color.holo_green_dark));
+            holder.placeText.setTextColor(ContextCompat.getColor(context, android.R.color.holo_green_dark));
+            holder.placeText.setAlpha(1f);
+
+            holder.distanceText.setTextColor(ContextCompat.getColor(context, android.R.color.holo_green_dark));
+        }
+        else if(magnitude >= 6.5){
+            holder.magnitudeText.setTextColor(ContextCompat.getColor(context, android.R.color.holo_red_dark));
+            holder.placeText.setTextColor(ContextCompat.getColor(context, android.R.color.holo_red_dark));
+            holder.placeText.setAlpha(1f);
+
+            holder.distanceText.setTextColor(ContextCompat.getColor(context, android.R.color.holo_red_dark));
+        }
+        else{
+            holder.magnitudeText.setTextColor(ContextCompat.getColor(context, android.R.color.black));
+            holder.placeText.setTextColor(ContextCompat.getColor(context, android.R.color.black));
+            holder.placeText.setAlpha(0.65f);
+
+            holder.distanceText.setTextColor(ContextCompat.getColor(context, android.R.color.black));
+        }
 
         String distanceToEarthquake = String.valueOf(earthquake.getDistanceToEpicenter());
 
