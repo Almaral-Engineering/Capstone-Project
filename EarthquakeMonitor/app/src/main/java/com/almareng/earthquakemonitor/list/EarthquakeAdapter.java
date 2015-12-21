@@ -45,8 +45,24 @@ public class EarthquakeAdapter extends ArrayAdapter<Earthquake> {
             holder = (EarthquakeViewHolder) convertView.getTag();
         }
 
-        holder.magnitudeText.setText(earthquake.getMagnitude());
+        holder.magnitudeText.setText(String.valueOf(earthquake.getMagnitude()));
         holder.placeText.setText(earthquake.getPlace());
+
+        String distanceToEarthquake = String.valueOf(earthquake.getDistanceToEpicenter());
+
+        if (distanceToEarthquake == null || distanceToEarthquake.isEmpty()) {
+            holder.distanceText.setVisibility(View.GONE);
+        } else {
+            holder.distanceText.setVisibility(View.VISIBLE);
+            holder.distanceText.setText(distanceToEarthquake);
+
+            if(distanceToEarthquake.contains(".")) {
+                distanceToEarthquake = distanceToEarthquake.substring(0, distanceToEarthquake.lastIndexOf("."));
+            }
+
+            holder.distanceText.setText(String.format(context.getString(R.string.distance_format),
+                                                      distanceToEarthquake));
+        }
 
         return convertView;
     }

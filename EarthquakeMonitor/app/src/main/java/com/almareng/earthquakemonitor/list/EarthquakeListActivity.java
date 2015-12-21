@@ -28,10 +28,9 @@ import java.util.ArrayList;
 public class EarthquakeListActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
     public static final String EARTHQUAKE_KEY = "earthquake";
-
-    private static final String PREFERENCE_LONGITUDE = "pref_lon";
-    private static final String PREFERENCE_LATITUDE = "pref_lat";
-    private static final String LOCATION_PREFERENCES = "location_pref";
+    public static final String PREFERENCE_LONGITUDE = "preference_longitude";
+    public static final String PREFERENCE_LATITUDE = "preference_latitude";
+    public static final String LOCATION_PREFS = "location_preference";
 
     private SettingsFragment settingsFragment;
     private GoogleApiClient mGoogleApiClient;
@@ -137,7 +136,7 @@ public class EarthquakeListActivity extends AppCompatActivity implements GoogleA
         } else {
             final String longitudeString = String.valueOf(mCurrentLocation.getLongitude());
             final String latitudeString = String.valueOf(mCurrentLocation.getLatitude());
-            final SharedPreferences locationPreference = getSharedPreferences(LOCATION_PREFERENCES, 0);
+            final SharedPreferences locationPreference = getSharedPreferences(LOCATION_PREFS, 0);
             final SharedPreferences.Editor editor = locationPreference.edit();
 
             editor.putString(PREFERENCE_LONGITUDE, longitudeString);
@@ -256,7 +255,7 @@ public class EarthquakeListActivity extends AppCompatActivity implements GoogleA
                     if (!((EarthquakeListActivity) getActivity()).isLocationNull()) {
                         final ListPreference listPreference = (ListPreference) preference;
                         final int prefIndex = listPreference.findIndexOfValue(stringValue);
-
+                        listPreference.setValue(value.toString());
                         if (prefIndex >= 0) {
                             preference.setSummary(listPreference.getEntries()[prefIndex]);
                         }

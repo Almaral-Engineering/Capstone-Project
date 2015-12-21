@@ -4,24 +4,26 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public class Earthquake implements Parcelable {
-    private final String mMagnitude;
+    private final Double mMagnitude;
     private final String mPlace;
     private final String mTimeAndDate;
     private final String mLatitude;
     private final String mLongitude;
     private final String mDepth;
+    private final String mDistanceToEpicenter;
 
-    public Earthquake(final String mMagnitude, final String mPlace, final String mTimeAndDate, final String mLongitude,
-                      final String mLatitude, final String mDepth) {
+    public Earthquake(final Double mMagnitude, final String mPlace, final String mTimeAndDate, final String mLongitude,
+                      final String mLatitude, final String mDepth, final String mDistanceToEpicenter) {
         this.mMagnitude = mMagnitude;
         this.mPlace = mPlace;
         this.mTimeAndDate = mTimeAndDate;
         this.mLatitude = mLatitude;
         this.mLongitude = mLongitude;
         this.mDepth = mDepth;
+        this.mDistanceToEpicenter = mDistanceToEpicenter;
     }
 
-    public String getMagnitude() {
+    public Double getMagnitude() {
         return mMagnitude;
     }
 
@@ -45,13 +47,18 @@ public class Earthquake implements Parcelable {
         return mDepth;
     }
 
+    public String getDistanceToEpicenter() {
+        return mDistanceToEpicenter;
+    }
+
     protected Earthquake(Parcel in) {
-        mMagnitude = in.readString();
+        mMagnitude = in.readDouble();
         mPlace = in.readString();
         mTimeAndDate = in.readString();
         mLatitude = in.readString();
         mLongitude = in.readString();
         mDepth = in.readString();
+        mDistanceToEpicenter = in.readString();
     }
 
     @Override
@@ -61,12 +68,13 @@ public class Earthquake implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(mMagnitude);
+        dest.writeDouble(mMagnitude);
         dest.writeString(mPlace);
         dest.writeString(mTimeAndDate);
         dest.writeString(mLatitude);
         dest.writeString(mLongitude);
         dest.writeString(mDepth);
+        dest.writeString(mDistanceToEpicenter);
     }
 
     @SuppressWarnings("unused")

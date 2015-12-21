@@ -41,9 +41,7 @@ public class DetailActivity extends AppCompatActivity {
         map.setMyLocationEnabled(true);
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(eqLocation, 7));
 
-        final String earthquakeMagnitude = earthquake.getMagnitude();
-        final Double magnitude = Double.parseDouble(earthquakeMagnitude);
-
+        final Double magnitude = earthquake.getMagnitude();
         float hueColor;
 
         if(magnitude >= 0 && magnitude <= 0.9){

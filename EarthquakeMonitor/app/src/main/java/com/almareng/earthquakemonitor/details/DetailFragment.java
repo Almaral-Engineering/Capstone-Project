@@ -36,7 +36,6 @@ public class DetailFragment extends Fragment {
         longitudeText = (TextView) view.findViewById(R.id.fragment_detail_longitude_text);
         latitudeText = (TextView) view.findViewById(R.id.fragment_detail_latitude_text);
         depthText = (TextView) view.findViewById(R.id.fragment_detail_depth_text);
-
     }
 
     public void setupViews(final Earthquake earthquake) {
@@ -50,7 +49,7 @@ public class DetailFragment extends Fragment {
             final String formattedDate = dateFormat.format(date);
             final String formattedTime = timeFormat.format(date);
 
-            magnitudeText.setText(earthquake.getMagnitude());
+            magnitudeText.setText(String.valueOf(earthquake.getMagnitude()));
             dateText.setText(formattedDate);
             timeText.setText(formattedTime);
             longitudeText.setText(earthquake.getLongitude());
