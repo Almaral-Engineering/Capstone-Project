@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">Earthquake Monitor</string>
 
+    <string name="content_authority">com.almareng.earthquakemonitor</string>
+
     <string name="action_settings">Settings</string>
     <string name="fragment_detail_location">Location:</string>
     <string name="earthquake_detail_date_format">dd MMM yyyy</string>
