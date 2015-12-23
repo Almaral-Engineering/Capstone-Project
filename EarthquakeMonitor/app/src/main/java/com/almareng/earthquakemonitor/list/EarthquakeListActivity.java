@@ -16,6 +16,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ProgressBar;
 
 import com.almareng.earthquakemonitor.R;
 import com.almareng.earthquakemonitor.api.ApiClient;
@@ -43,11 +44,14 @@ public class EarthquakeListActivity extends AppCompatActivity implements GoogleA
     private boolean showGpsPrompt = false;
     private Toolbar toolbar;
     private EarthquakeListFragment earthquakeListFragment;
+    private ProgressBar loadingSpinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_earthquake_list);
+
+        loadingSpinner = (ProgressBar) findViewById(R.id.earthquake_list_activity_loading_spinner);
 
         setupToolbar();
         fetchEarthquakeData();
@@ -148,6 +152,8 @@ public class EarthquakeListActivity extends AppCompatActivity implements GoogleA
     }
 
     private void fetchEarthquakeData() {
+        loadingSpinner.setVisibility(View.VISIBLE);
+
         final SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         final String postUrl = sharedPrefs.getString(getString(R.string.searching_time_key),
                                                      getString(R.string.searching_time_default));
@@ -155,10 +161,12 @@ public class EarthquakeListActivity extends AppCompatActivity implements GoogleA
         ApiClient.getEarthquakeData(this, postUrl, new EarthquakeDataListener() {
             @Override
             public void onResponse(final ArrayList<Earthquake> earthquakes) {
+                loadingSpinner.setVisibility(View.GONE);
             }
 
             @Override
             public void onErrorResponse(final Exception error) {
+                loadingSpinner.setVisibility(View.GONE);
             }
         });
     }
