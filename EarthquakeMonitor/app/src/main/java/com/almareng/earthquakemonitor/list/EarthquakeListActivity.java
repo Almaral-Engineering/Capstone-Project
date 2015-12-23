@@ -13,7 +13,6 @@ import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -32,21 +31,10 @@ public class EarthquakeListActivity extends AppCompatActivity implements GoogleA
     public static final String PREFERENCE_LONGITUDE = "preference_longitude";
     public static final String PREFERENCE_LATITUDE = "preference_latitude";
     public static final String LOCATION_PREFS = "location_preference";
-    public static final String MAGNITUDE = "mag";
-    public static final String PLACE = "place";
-    public static final String TIME_DATE = "time";
-    public static final String LONGITUDE= "longitude";
-    public static final String LATITUDE = "latitude";
-    public static final String DEPTH = "depth";
-    public static final String DISTANCE = "distance";
 
     // Database Columns
     public static final int COL_EQ_MAGNITUDE = 1;
     public static final int COL_EQ_PLACE= 2;
-    public static final int COL_EQ_TIME_DATE = 3;
-    public static final int COL_EQ_LATITUDE = 4;
-    public static final int COL_EQ_LONGITUDE = 5;
-    public static final int COL_EQ_DEPTH = 6;
     public static final int COL_EQ_DISTANCE = 7;
 
     private SettingsFragment settingsFragment;
@@ -167,12 +155,10 @@ public class EarthquakeListActivity extends AppCompatActivity implements GoogleA
         ApiClient.getEarthquakeData(this, postUrl, new EarthquakeDataListener() {
             @Override
             public void onResponse(final ArrayList<Earthquake> earthquakes) {
-                Log.d("MANZANA", earthquakes.size() + "");
             }
 
             @Override
             public void onErrorResponse(final Exception error) {
-                Log.d("MANZANA", "Error");
             }
         });
     }
