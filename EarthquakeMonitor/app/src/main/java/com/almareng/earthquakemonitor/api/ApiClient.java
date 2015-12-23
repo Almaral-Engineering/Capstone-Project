@@ -1,11 +1,13 @@
 package com.almareng.earthquakemonitor.api;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.preference.PreferenceManager;
 
 import com.almareng.earthquakemonitor.R;
+import com.almareng.earthquakemonitor.data.EqContract;
 import com.almareng.earthquakemonitor.list.Earthquake;
 import com.almareng.earthquakemonitor.list.EarthquakeDataListener;
 import com.almareng.earthquakemonitor.list.EarthquakeListActivity;
@@ -19,6 +21,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Vector;
 
 public class ApiClient {
     private static final String BASE_URL = "http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/";
@@ -39,19 +42,20 @@ public class ApiClient {
 
     public static void getEarthquakeData(final Context context, String url, final EarthquakeDataListener listener) {
         switch (url) {
-            case "hour":
+            case HOUR_PATH:
                 url = LAST_HOUR_DATA;
                 break;
-            case "day":
+            case DAY_PATH:
                 url = LAST_DAY_DATA;
                 break;
-            case "week":
+            case WEEK_PATH:
                 url = LAST_WEEK_DATA;
                 break;
         }
 
         final String path = BASE_URL + url;
         final JsonObjectRequest jsonObjectRequest;
+
         jsonObjectRequest = new JsonObjectRequest(path, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(final JSONObject response) {
@@ -84,6 +88,8 @@ public class ApiClient {
             return null;
         }
 
+        final Vector<ContentValues> cVVector = new Vector<>(features.length());
+
         for (int i = 0; i < features.length(); i++) {
             final Double magnitude;
             final String place;
@@ -98,7 +104,13 @@ public class ApiClient {
             try {
                 final JSONObject feature = (JSONObject) features.get(i);
                 final JSONObject properties = feature.getJSONObject(PROPERTIES);
-                magnitude = properties.getDouble(MAGNITUDE);
+                final String magnitudeString = properties.getString(MAGNITUDE);
+
+                if (magnitudeString.equals("null") || magnitudeString.isEmpty()) {
+                    continue;
+                }
+
+                magnitude = Double.parseDouble(magnitudeString);
 
                 if (minMagnitude > magnitude) {
                     continue;
@@ -109,7 +121,6 @@ public class ApiClient {
                 longitude = coordinates.getString(0);
                 latitude = coordinates.getString(1);
                 depth = coordinates.getString(2);
-
                 distanceToEpicenter = getDistanceToEpicenter(context, longitude, latitude);
 
                 if (maxDistance < distanceToEpicenter) {
@@ -124,16 +135,41 @@ public class ApiClient {
                 return null;
             }
 
-            earthquakes.add(new Earthquake(magnitude,
-                                           place,
-                                           timeDate,
-                                           longitude,
-                                           latitude,
-                                           depth,
-                                           String.valueOf(distanceToEpicenter)));
+            final Earthquake earthquake = new Earthquake(magnitude,
+                                                         place,
+                                                         timeDate,
+                                                         longitude,
+                                                         latitude,
+                                                         depth,
+                                                         String.valueOf(distanceToEpicenter));
+
+            cVVector.add(createEarthquakeContentValues(earthquake));
+            earthquakes.add(earthquake);
+        }
+
+        context.getContentResolver().delete(EqContract.Entry.CONTENT_URI, null, null);
+
+        if (cVVector.size() > 0) {
+            ContentValues[] cvArray = new ContentValues[cVVector.size()];
+            cVVector.toArray(cvArray);
+            context.getContentResolver().bulkInsert(EqContract.Entry.CONTENT_URI, cvArray);
         }
 
         return earthquakes;
+    }
+
+    private static ContentValues createEarthquakeContentValues(final Earthquake earthquake) {
+        final ContentValues contentValues = new ContentValues();
+
+        contentValues.put(EqContract.Entry.COLUMN_EQ_MAGNITUDE, earthquake.getMagnitude());
+        contentValues.put(EqContract.Entry.COLUMN_EQ_PLACE, earthquake.getPlace());
+        contentValues.put(EqContract.Entry.COLUMN_EQ_TIME_DATE, earthquake.getTimeAndDate());
+        contentValues.put(EqContract.Entry.COLUMN_EQ_LATITUDE, earthquake.getLatitude());
+        contentValues.put(EqContract.Entry.COLUMN_EQ_LONGITUDE, earthquake.getLongitude());
+        contentValues.put(EqContract.Entry.COLUMN_EQ_DEPTH, earthquake.getDepth());
+        contentValues.put(EqContract.Entry.COLUMN_EQ_DISTANCE, earthquake.getDistanceToEpicenter());
+
+        return contentValues;
     }
 
     private static void queueRequest(final Context context, final Request<?> request) {

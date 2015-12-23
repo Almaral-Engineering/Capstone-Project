@@ -1,55 +1,38 @@
 package com.almareng.earthquakemonitor.list;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
+import android.widget.CursorAdapter;
 import android.widget.TextView;
 
 import com.almareng.earthquakemonitor.R;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class EarthquakeAdapter extends ArrayAdapter<Earthquake> {
-    private final Context context;
-    private final ArrayList<Earthquake> earthquakes;
-
-    public EarthquakeAdapter(Context context, ArrayList<Earthquake> earthquakes) {
-        super(context, R.layout.earthquake_list_item);
-        this.context = context;
-        this.earthquakes = earthquakes;
+public class EarthquakeAdapter extends CursorAdapter {
+    public EarthquakeAdapter(final Context context, final Cursor cursor, final int flags) {
+        super(context, cursor, flags);
     }
 
     @Override
-    public int getCount() {
-        return earthquakes.size();
+    public View newView(final Context context, final Cursor cursor, final ViewGroup parent) {
+        final View view = LayoutInflater.from(context).inflate(R.layout.earthquake_list_item, parent, false);
+        final EarthquakeViewHolder eqHolder = new EarthquakeViewHolder(view);
+
+        view.setTag(eqHolder);
+        return view;
     }
 
     @Override
-    public Earthquake getItem(int position) {
-        return earthquakes.get(position);
-    }
+    public void bindView(final View view, final Context context, final Cursor cursor) {
+        final EarthquakeViewHolder holder = new EarthquakeViewHolder(view);
 
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        final Earthquake earthquake = earthquakes.get(position);
-        final EarthquakeViewHolder holder;
-
-        if (convertView == null) {
-            convertView = LayoutInflater.from(context).inflate(R.layout.earthquake_list_item, parent, false);
-            holder = new EarthquakeViewHolder(convertView);
-            convertView.setTag(holder);
-        } else{
-            holder = (EarthquakeViewHolder) convertView.getTag();
-        }
-
-        final Double magnitude = earthquake.getMagnitude();
+        final Double magnitude = cursor.getDouble(EarthquakeListActivity.COL_EQ_MAGNITUDE);
 
         holder.magnitudeText.setText(String.valueOf(magnitude));
-        holder.placeText.setText(earthquake.getPlace());
+        holder.placeText.setText(cursor.getString(EarthquakeListActivity.COL_EQ_PLACE));
 
         if(magnitude >= 0 && magnitude <= 3.5){
             holder.magnitudeText.setTextColor(ContextCompat.getColor(context, android.R.color.holo_green_dark));
@@ -73,9 +56,9 @@ public class EarthquakeAdapter extends ArrayAdapter<Earthquake> {
             holder.distanceText.setTextColor(ContextCompat.getColor(context, android.R.color.black));
         }
 
-        String distanceToEarthquake = String.valueOf(earthquake.getDistanceToEpicenter());
+        String distanceToEarthquake = String.valueOf(cursor.getDouble(EarthquakeListActivity.COL_EQ_DISTANCE));
 
-        if (distanceToEarthquake == null || distanceToEarthquake.isEmpty()) {
+        if (distanceToEarthquake.isEmpty()) {
             holder.distanceText.setVisibility(View.GONE);
         } else {
             holder.distanceText.setVisibility(View.VISIBLE);
@@ -88,14 +71,6 @@ public class EarthquakeAdapter extends ArrayAdapter<Earthquake> {
             holder.distanceText.setText(String.format(context.getString(R.string.distance_format),
                                                       distanceToEarthquake));
         }
-
-        return convertView;
-    }
-
-    public void updateEarthquakeList(final List<Earthquake> earthquakes) {
-        this.earthquakes.clear();
-        this.earthquakes.addAll(earthquakes);
-        this.notifyDataSetChanged();
     }
 
     private class EarthquakeViewHolder {

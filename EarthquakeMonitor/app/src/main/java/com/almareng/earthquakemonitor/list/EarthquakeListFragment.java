@@ -1,7 +1,11 @@
 package com.almareng.earthquakemonitor.list;
 
 import android.app.Fragment;
+import android.app.LoaderManager;
+import android.content.CursorLoader;
 import android.content.Intent;
+import android.content.Loader;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,26 +14,33 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.almareng.earthquakemonitor.R;
+import com.almareng.earthquakemonitor.data.EqContract;
 import com.almareng.earthquakemonitor.details.DetailActivity;
 
-import java.util.ArrayList;
+public final class EarthquakeListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+    // Database Columns
+    public static final int COL_EQ_MAGNITUDE = 1;
+    public static final int COL_EQ_PLACE= 2;
+    public static final int COL_EQ_TIME_DATE = 3;
+    public static final int COL_EQ_LATITUDE = 4;
+    public static final int COL_EQ_LONGITUDE = 5;
+    public static final int COL_EQ_DEPTH = 6;
+    public static final int COL_EQ_DISTANCE = 7;
 
-public final class EarthquakeListFragment extends Fragment {
-    private static final String EARTHQUAKE_LIST_KEY = "earthquake_list";
+    private static final int EARTHQUAKE_LOADER_ID = 0;
 
-    private ArrayList<Earthquake> earthquakes;
+    private static final String[] ENTRY_COLUMNS = {
+            EqContract.Entry._ID,
+            EqContract.Entry.COLUMN_EQ_MAGNITUDE,
+            EqContract.Entry.COLUMN_EQ_PLACE,
+            EqContract.Entry.COLUMN_EQ_TIME_DATE,
+            EqContract.Entry.COLUMN_EQ_LATITUDE,
+            EqContract.Entry.COLUMN_EQ_LONGITUDE,
+            EqContract.Entry.COLUMN_EQ_DEPTH,
+            EqContract.Entry.COLUMN_EQ_DISTANCE
+    };
+
     private EarthquakeAdapter earthquakeAdapter;
-
-    public static EarthquakeListFragment newInstance(final ArrayList<Earthquake> earthquakes) {
-
-        final Bundle args = new Bundle();
-
-        args.putParcelableArrayList(EARTHQUAKE_LIST_KEY, earthquakes);
-
-        final EarthquakeListFragment fragment = new EarthquakeListFragment();
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
@@ -42,23 +53,46 @@ public final class EarthquakeListFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         final ListView earthquakeList = (ListView) view.findViewById(R.id.earthquake_list);
-        earthquakes = getArguments().getParcelableArrayList(EARTHQUAKE_LIST_KEY);
-        earthquakeAdapter = new EarthquakeAdapter(getActivity(), earthquakes);
+        earthquakeAdapter = new EarthquakeAdapter(getActivity(), null, 0);
 
         earthquakeList.setAdapter(earthquakeAdapter);
         earthquakeList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(final AdapterView<?> parent, final View view, final int position, final long id) {
-                final Earthquake chosenEarthquake = earthquakeAdapter.getItem(position);
-                final Intent intent = new Intent(getActivity(), DetailActivity.class);
+                final Cursor cursor = earthquakeAdapter.getCursor();
 
-                intent.putExtra(EarthquakeListActivity.EARTHQUAKE_KEY, chosenEarthquake);
-                startActivity(intent);
+                if (cursor != null && cursor.moveToPosition(position)) {
+                    final Earthquake earthquake = new Earthquake(cursor.getDouble(COL_EQ_MAGNITUDE),
+                                                                 cursor.getString(COL_EQ_PLACE),
+                                                                 cursor.getString(COL_EQ_TIME_DATE),
+                                                                 cursor.getString(COL_EQ_LONGITUDE),
+                                                                 cursor.getString(COL_EQ_LATITUDE),
+                                                                 cursor.getString(COL_EQ_DEPTH),
+                                                                 cursor.getString(COL_EQ_DISTANCE));
+
+                    final Intent detailIntent = new Intent(getActivity(), DetailActivity.class);
+
+                    detailIntent.putExtra(EarthquakeListActivity.EARTHQUAKE_KEY, earthquake);
+                    startActivity(detailIntent);
+                }
             }
         });
+
+        getLoaderManager().initLoader(EARTHQUAKE_LOADER_ID, null, this);
     }
 
-    public void reloadEarthquakes(final ArrayList<Earthquake> earthquakes) {
-        earthquakeAdapter.updateEarthquakeList(earthquakes);
+    @Override
+    public Loader<Cursor> onCreateLoader(final int id, final Bundle args) {
+        return new CursorLoader(getActivity(), EqContract.Entry.CONTENT_URI, ENTRY_COLUMNS, null, null, null);
+    }
+
+    @Override
+    public void onLoadFinished(final Loader<Cursor> loader, final Cursor data) {
+        earthquakeAdapter.swapCursor(data);
+    }
+
+    @Override
+    public void onLoaderReset(final Loader<Cursor> loader) {
+        earthquakeAdapter.swapCursor(null);
     }
 }

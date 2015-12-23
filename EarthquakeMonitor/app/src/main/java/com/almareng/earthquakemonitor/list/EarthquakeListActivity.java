@@ -13,6 +13,7 @@ import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -31,6 +32,22 @@ public class EarthquakeListActivity extends AppCompatActivity implements GoogleA
     public static final String PREFERENCE_LONGITUDE = "preference_longitude";
     public static final String PREFERENCE_LATITUDE = "preference_latitude";
     public static final String LOCATION_PREFS = "location_preference";
+    public static final String MAGNITUDE = "mag";
+    public static final String PLACE = "place";
+    public static final String TIME_DATE = "time";
+    public static final String LONGITUDE= "longitude";
+    public static final String LATITUDE = "latitude";
+    public static final String DEPTH = "depth";
+    public static final String DISTANCE = "distance";
+
+    // Database Columns
+    public static final int COL_EQ_MAGNITUDE = 1;
+    public static final int COL_EQ_PLACE= 2;
+    public static final int COL_EQ_TIME_DATE = 3;
+    public static final int COL_EQ_LATITUDE = 4;
+    public static final int COL_EQ_LONGITUDE = 5;
+    public static final int COL_EQ_DEPTH = 6;
+    public static final int COL_EQ_DISTANCE = 7;
 
     private SettingsFragment settingsFragment;
     private GoogleApiClient mGoogleApiClient;
@@ -45,7 +62,7 @@ public class EarthquakeListActivity extends AppCompatActivity implements GoogleA
         setContentView(R.layout.activity_earthquake_list);
 
         setupToolbar();
-        fetchEarthquakeData(false);
+        fetchEarthquakeData();
         inflateMenu();
 
         mGoogleApiClient =  new GoogleApiClient.Builder(this)
@@ -57,33 +74,12 @@ public class EarthquakeListActivity extends AppCompatActivity implements GoogleA
         mGoogleApiClient.connect();
 
         settingsFragment = new SettingsFragment();
-    }
+        earthquakeListFragment = new EarthquakeListFragment();
+        final FragmentTransaction transaction = getFragmentManager().beginTransaction();
 
-    private void fetchEarthquakeData(final boolean reload) {
-        final SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        final String postUrl = sharedPrefs.getString(getString(R.string.searching_time_key),
-                                                     getString(R.string.searching_time_default));
-
-        ApiClient.getEarthquakeData(this, postUrl, new EarthquakeDataListener() {
-            @Override
-            public void onResponse(final ArrayList<Earthquake> earthquakes) {
-                if (reload) {
-                    earthquakeListFragment.reloadEarthquakes(earthquakes);
-                } else {
-                    earthquakeListFragment = EarthquakeListFragment.newInstance(earthquakes);
-                    final FragmentTransaction transaction = getFragmentManager().beginTransaction();
-
-                    transaction.add(R.id.main_frame_layout, earthquakeListFragment);
-                    transaction.addToBackStack(null);
-                    transaction.commit();
-                }
-            }
-
-            @Override
-            public void onErrorResponse(final Exception error) {
-
-            }
-        });
+        transaction.add(R.id.main_frame_layout, earthquakeListFragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
     }
 
     @Override
@@ -144,7 +140,7 @@ public class EarthquakeListActivity extends AppCompatActivity implements GoogleA
             editor.apply();
 
             if(showGpsPrompt) {
-                fetchEarthquakeData(true);
+                fetchEarthquakeData();
             }
         }
 
@@ -161,6 +157,24 @@ public class EarthquakeListActivity extends AppCompatActivity implements GoogleA
     @Override
     public void onConnectionFailed(final ConnectionResult connectionResult) {
 
+    }
+
+    private void fetchEarthquakeData() {
+        final SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        final String postUrl = sharedPrefs.getString(getString(R.string.searching_time_key),
+                                                     getString(R.string.searching_time_default));
+
+        ApiClient.getEarthquakeData(this, postUrl, new EarthquakeDataListener() {
+            @Override
+            public void onResponse(final ArrayList<Earthquake> earthquakes) {
+                Log.d("MANZANA", earthquakes.size() + "");
+            }
+
+            @Override
+            public void onErrorResponse(final Exception error) {
+                Log.d("MANZANA", "Error");
+            }
+        });
     }
 
     private void setupToolbar() {
@@ -197,7 +211,6 @@ public class EarthquakeListActivity extends AppCompatActivity implements GoogleA
     }
 
     private void inflateMenu() {
-
         toolbar.inflateMenu(R.menu.menu_main);
 
         toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
@@ -268,7 +281,7 @@ public class EarthquakeListActivity extends AppCompatActivity implements GoogleA
                     listPreference.setValue(value.toString());
                     if (prefIndex >= 0) {
                         preference.setSummary(listPreference.getEntries()[prefIndex]);
-                        ((EarthquakeListActivity) getActivity()).fetchEarthquakeData(true);
+                        ((EarthquakeListActivity) getActivity()).fetchEarthquakeData();
                     }
                 }
             }
