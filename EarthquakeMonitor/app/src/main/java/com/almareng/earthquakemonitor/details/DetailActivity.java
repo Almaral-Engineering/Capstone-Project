@@ -38,6 +38,10 @@ public class DetailActivity extends AppCompatActivity {
         final LatLng eqLocation = new LatLng(Double.parseDouble(earthquake.getLatitude()),
                                              Double.parseDouble(earthquake.getLongitude()));
 
+        if(map == null) {
+            return;
+        }
+
         map.setMyLocationEnabled(true);
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(eqLocation, 7));
 
