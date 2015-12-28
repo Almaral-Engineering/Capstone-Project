@@ -1,18 +1,15 @@
 package com.almareng.earthquakemonitor.details;
 
-import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.almareng.earthquakemonitor.list.Earthquake;
 import com.almareng.earthquakemonitor.R;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
+import com.almareng.earthquakemonitor.Utils;
+import com.almareng.earthquakemonitor.list.Earthquake;
 
 public class DetailFragment extends Fragment {
     private TextView magnitudeText;
@@ -39,22 +36,16 @@ public class DetailFragment extends Fragment {
     }
 
     public void setupViews(final Earthquake earthquake) {
-        if (earthquake != null) {
-            final Long unixSeconds = Long.parseLong(earthquake.getTimeAndDate());
-            final Date date = new Date(unixSeconds);
-            final SimpleDateFormat dateFormat = new SimpleDateFormat(getString(R.string.earthquake_detail_date_format),
-                                                                     Locale.getDefault());
-            final SimpleDateFormat timeFormat = new SimpleDateFormat(getString(R.string.earthquake_detail_time_format),
-                                                                     Locale.getDefault());
-            final String formattedDate = dateFormat.format(date);
-            final String formattedTime = timeFormat.format(date);
+        final String formattedDate = Utils.getFormattedDateTime(earthquake.getTimeAndDate(),
+                                                                getString(R.string.earthquake_detail_date_format));
+        final String formattedTime = Utils.getFormattedDateTime(earthquake.getTimeAndDate(),
+                                                                getString(R.string.earthquake_detail_time_format));
 
-            magnitudeText.setText(String.valueOf(earthquake.getMagnitude()));
-            dateText.setText(formattedDate);
-            timeText.setText(formattedTime);
-            longitudeText.setText(earthquake.getLongitude());
-            latitudeText.setText(earthquake.getLatitude());
-            depthText.setText(earthquake.getDepth());
-        }
+        magnitudeText.setText(String.valueOf(earthquake.getMagnitude()));
+        dateText.setText(formattedDate);
+        timeText.setText(formattedTime);
+        longitudeText.setText(earthquake.getLongitude());
+        latitudeText.setText(earthquake.getLatitude());
+        depthText.setText(earthquake.getDepth());
     }
 }

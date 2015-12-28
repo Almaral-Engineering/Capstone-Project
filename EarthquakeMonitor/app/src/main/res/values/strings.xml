@@ -31,5 +31,7 @@
     <string name="title_activity_settings">Settings</string>
 
     <string name="distance_format">Distance: %s km</string>
+    <string name="sharing_intent_message" formatted="false">There was an Earthquake with magnitude %s on date %s at %s %s, with coordinates lat: %s and lon: %s</string>
+    <string name="action_share">Share Data</string>
 
 </resources>
