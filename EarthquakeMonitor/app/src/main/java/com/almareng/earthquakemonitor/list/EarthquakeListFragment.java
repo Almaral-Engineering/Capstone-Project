@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,6 +43,7 @@ public final class EarthquakeListFragment extends Fragment implements LoaderMana
     };
 
     private EarthquakeAdapter earthquakeAdapter;
+    private SwipeRefreshLayout refreshLayout;
 
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
@@ -55,6 +57,7 @@ public final class EarthquakeListFragment extends Fragment implements LoaderMana
 
         final ListView earthquakeList = (ListView) view.findViewById(R.id.earthquake_list);
         final TextView emptyView = (TextView) view.findViewById(R.id.earthquake_list_empty_view);
+        refreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.earthquake_list_refresher);
         earthquakeAdapter = new EarthquakeAdapter(getActivity(), null, 0);
 
         earthquakeList.setEmptyView(emptyView);
@@ -81,6 +84,13 @@ public final class EarthquakeListFragment extends Fragment implements LoaderMana
             }
         });
 
+        refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                getLoaderManager().restartLoader(EARTHQUAKE_LOADER_ID, null, EarthquakeListFragment.this);
+            }
+        });
+
         getLoaderManager().initLoader(EARTHQUAKE_LOADER_ID, null, this);
     }
 
@@ -92,6 +102,7 @@ public final class EarthquakeListFragment extends Fragment implements LoaderMana
     @Override
     public void onLoadFinished(final Loader<Cursor> loader, final Cursor data) {
         earthquakeAdapter.swapCursor(data);
+        refreshLayout.setRefreshing(false);
     }
 
     @Override
