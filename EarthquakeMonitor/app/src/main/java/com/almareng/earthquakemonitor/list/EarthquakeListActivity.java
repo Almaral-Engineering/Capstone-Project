@@ -220,7 +220,7 @@ public class EarthquakeListActivity extends AppCompatActivity implements GoogleA
                     transaction.commit();
                     toolbar.setTitle(getString(R.string.title_activity_settings));
                     toolbar.getMenu().clear();
-                    toolbar.setNavigationIcon(R.drawable.ic_action_back);
+                    toolbar.setNavigationIcon(R.mipmap.ic_arrow_left);
                     toolbar.setNavigationOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(final View v) {
