@@ -17,6 +17,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.almareng.earthquakemonitor.R;
 import com.almareng.earthquakemonitor.api.ApiClient;
@@ -167,6 +168,9 @@ public class EarthquakeListActivity extends AppCompatActivity implements GoogleA
             @Override
             public void onErrorResponse(final Exception error) {
                 loadingSpinner.setVisibility(View.GONE);
+                Toast.makeText(EarthquakeListActivity.this,
+                               getString(R.string.volley_fetching_error_message),
+                               Toast.LENGTH_SHORT).show();
             }
         });
     }
