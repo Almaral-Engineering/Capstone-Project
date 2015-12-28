@@ -13,4 +13,13 @@
         android:dividerHeight="@dimen/activity_earthquake_list_divider_height"
         android:padding="@dimen/activity_earthquake_list_padding"/>
 
+    <TextView
+        android:id="@+id/earthquake_list_empty_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/earthquake_list_empty_view_message"
+        android:gravity="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Title"
+        android:layout_centerInParent="true"/>
+
 </RelativeLayout>

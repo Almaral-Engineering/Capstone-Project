@@ -33,5 +33,6 @@
     <string name="distance_format">Distance: %s km</string>
     <string name="sharing_intent_message" formatted="false">There was an Earthquake with magnitude %s on date %s at %s %s, with coordinates lat: %s and lon: %s</string>
     <string name="action_share">Share Data</string>
+    <string name="earthquake_list_empty_view_message">No earthquakes registered for the chosen settings</string>
 
 </resources>

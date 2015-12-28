@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.almareng.earthquakemonitor.R;
 import com.almareng.earthquakemonitor.data.EqContract;
@@ -53,8 +54,10 @@ public final class EarthquakeListFragment extends Fragment implements LoaderMana
         super.onViewCreated(view, savedInstanceState);
 
         final ListView earthquakeList = (ListView) view.findViewById(R.id.earthquake_list);
+        final TextView emptyView = (TextView) view.findViewById(R.id.earthquake_list_empty_view);
         earthquakeAdapter = new EarthquakeAdapter(getActivity(), null, 0);
 
+        earthquakeList.setEmptyView(emptyView);
         earthquakeList.setAdapter(earthquakeAdapter);
         earthquakeList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
