@@ -24,7 +24,8 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".details.DetailActivity" >
+            android:name=".details.DetailActivity"
+            android:parentActivityName="com.almareng.earthquakemonitor.list.EarthquakeListActivity" >
         </activity>
 
         <meta-data
