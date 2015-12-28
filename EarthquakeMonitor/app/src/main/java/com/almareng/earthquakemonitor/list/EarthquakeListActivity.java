@@ -44,7 +44,6 @@ public class EarthquakeListActivity extends AppCompatActivity implements GoogleA
     private Location mCurrentLocation;
     private boolean showGpsPrompt = false;
     private Toolbar toolbar;
-    private EarthquakeListFragment earthquakeListFragment;
     private ProgressBar loadingSpinner;
 
     @Override
@@ -67,7 +66,8 @@ public class EarthquakeListActivity extends AppCompatActivity implements GoogleA
         mGoogleApiClient.connect();
 
         settingsFragment = new SettingsFragment();
-        earthquakeListFragment = new EarthquakeListFragment();
+
+        final EarthquakeListFragment earthquakeListFragment = new EarthquakeListFragment();
         final FragmentTransaction transaction = getFragmentManager().beginTransaction();
 
         transaction.add(R.id.main_frame_layout, earthquakeListFragment);
