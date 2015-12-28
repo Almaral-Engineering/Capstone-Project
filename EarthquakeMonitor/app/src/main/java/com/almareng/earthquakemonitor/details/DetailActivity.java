@@ -118,10 +118,11 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     private Intent getDefaultIntent() {
-        final String formattedDate = Utils.getFormattedDateTime(earthquake.getTimeAndDate(),
-                                                                getString(R.string.earthquake_detail_date_format));
-        final String formattedTime = Utils.getFormattedDateTime(earthquake.getTimeAndDate(),
-                                                                getString(R.string.earthquake_detail_time_format));
+        final String timeAndDate = earthquake.getTimeAndDate();
+        final String dateFormat = getString(R.string.earthquake_detail_date_format);
+        final String timeFormat = getString(R.string.earthquake_detail_time_format);
+        final String formattedDate = Utils.getFormattedDateTime(timeAndDate, dateFormat);
+        final String formattedTime = Utils.getFormattedDateTime(timeAndDate, timeFormat);
         final Intent shareIntent = new Intent(Intent.ACTION_SEND);
 
         shareIntent.setType("text/plain");
