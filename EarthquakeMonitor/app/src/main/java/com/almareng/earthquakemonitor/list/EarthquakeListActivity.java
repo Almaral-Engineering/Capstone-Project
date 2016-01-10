@@ -1,5 +1,6 @@
 package com.almareng.earthquakemonitor.list;
 
+import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -10,9 +11,12 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.ShareActionProvider;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,15 +24,24 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.almareng.earthquakemonitor.R;
+import com.almareng.earthquakemonitor.Utils;
 import com.almareng.earthquakemonitor.api.ApiClient;
+import com.almareng.earthquakemonitor.details.DetailActivity;
+import com.almareng.earthquakemonitor.details.DetailFragment;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
 
 public class EarthquakeListActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener {
+        GoogleApiClient.OnConnectionFailedListener, EarthquakeListFragment.EarthquakeSelectedListener {
     public static final String EARTHQUAKE_KEY = "earthquake";
     public static final String PREFERENCE_LONGITUDE = "preference_longitude";
     public static final String PREFERENCE_LATITUDE = "preference_latitude";
@@ -45,6 +58,9 @@ public class EarthquakeListActivity extends AppCompatActivity implements GoogleA
     private boolean showGpsPrompt = false;
     private Toolbar toolbar;
     private ProgressBar loadingSpinner;
+    private boolean mTwoPane;
+    private Earthquake selectedEarthquake;
+    private ShareActionProvider mShareActionProvider;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +89,58 @@ public class EarthquakeListActivity extends AppCompatActivity implements GoogleA
         transaction.add(R.id.main_frame_layout, earthquakeListFragment);
         transaction.addToBackStack(null);
         transaction.commit();
+
+        mTwoPane = findViewById(R.id.earthquake_detail_tablet_layout) != null;
+    }
+
+    @Override
+    public void onEarthquakeSelected(final Earthquake earthquake) {
+        if (mTwoPane) {
+            selectedEarthquake = earthquake;
+
+            final FragmentManager fragmentManager = getFragmentManager();
+            final DetailFragment fragment = (DetailFragment) fragmentManager.findFragmentById(R.id.fragment_detail);
+
+            mShareActionProvider.setShareIntent(getDefaultIntent());
+            fragment.setupViews(earthquake);
+            setupMap(earthquake);
+        } else {
+            final Intent detailIntent = new Intent(this, DetailActivity.class);
+
+            detailIntent.putExtra(EarthquakeListActivity.EARTHQUAKE_KEY, earthquake);
+            startActivity(detailIntent);
+        }
+    }
+
+    private void setupMap(final Earthquake earthquake) {
+        final GoogleMap map = ((MapFragment) getFragmentManager().findFragmentById(R.id.activity_detail_map)).getMap();
+        final LatLng eqLocation = new LatLng(Double.parseDouble(earthquake.getLatitude()),
+                                             Double.parseDouble(earthquake.getLongitude()));
+
+        if(map == null) {
+            return;
+        }
+
+        map.setMyLocationEnabled(true);
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(eqLocation, 7));
+
+        final Double magnitude = earthquake.getMagnitude();
+        float hueColor;
+
+        if(magnitude >= 0 && magnitude <= 0.9){
+            hueColor = BitmapDescriptorFactory.HUE_GREEN;
+        }
+        else if(magnitude >= 9.0 && magnitude <= 9.9){
+            hueColor = BitmapDescriptorFactory.HUE_RED;
+        }
+        else{
+            hueColor = BitmapDescriptorFactory.HUE_BLUE;
+        }
+
+        map.addMarker(new MarkerOptions()
+                              .title(getString(R.string.activity_detail_map_epicenter))
+                              .position(eqLocation)
+                              .icon(BitmapDescriptorFactory.defaultMarker(hueColor)));
     }
 
     @Override
@@ -90,9 +158,36 @@ public class EarthquakeListActivity extends AppCompatActivity implements GoogleA
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+    public boolean onCreateOptionsMenu(final Menu menu) {
+        if (mTwoPane) {
+            getMenuInflater().inflate(R.menu.menu_main_tablet, menu);
+
+            final MenuItem shareItem = menu.findItem(R.id.action_share);
+
+            mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(shareItem);
+        } else {
+            getMenuInflater().inflate(R.menu.menu_main, menu);
+        }
         return true;
+    }
+
+    private Intent getDefaultIntent() {
+        final String timeAndDate = selectedEarthquake.getTimeAndDate();
+        final String dateFormat = getString(R.string.earthquake_detail_date_format);
+        final String timeFormat = getString(R.string.earthquake_detail_time_format);
+        final String formattedDate = Utils.getFormattedDateTime(timeAndDate, dateFormat);
+        final String formattedTime = Utils.getFormattedDateTime(timeAndDate, timeFormat);
+        final Intent shareIntent = new Intent(Intent.ACTION_SEND);
+
+        shareIntent.setType("text/plain");
+        shareIntent.putExtra(Intent.EXTRA_TEXT, String.format(getString(R.string.sharing_intent_message),
+                                                              selectedEarthquake.getMagnitude(),
+                                                              formattedDate,
+                                                              formattedTime,
+                                                              selectedEarthquake.getPlace(),
+                                                              selectedEarthquake.getLatitude(),
+                                                              selectedEarthquake.getLongitude()));
+        return shareIntent;
     }
 
     @Override
@@ -132,9 +227,7 @@ public class EarthquakeListActivity extends AppCompatActivity implements GoogleA
             editor.putString(PREFERENCE_LATITUDE, latitudeString);
             editor.apply();
 
-            if(showGpsPrompt) {
-                fetchEarthquakeData();
-            }
+            fetchEarthquakeData();
         }
 
         if(mGoogleApiClient.isConnected()) {
@@ -149,7 +242,6 @@ public class EarthquakeListActivity extends AppCompatActivity implements GoogleA
 
     @Override
     public void onConnectionFailed(final ConnectionResult connectionResult) {
-
     }
 
     private void fetchEarthquakeData() {
@@ -162,6 +254,18 @@ public class EarthquakeListActivity extends AppCompatActivity implements GoogleA
         ApiClient.getEarthquakeData(this, postUrl, new EarthquakeDataListener() {
             @Override
             public void onResponse(final ArrayList<Earthquake> earthquakes) {
+                if (mTwoPane) {
+                    final FragmentManager fragmentManager = getFragmentManager();
+                    final DetailFragment fragment =
+                            (DetailFragment) fragmentManager.findFragmentById(R.id.fragment_detail);
+
+                    if (earthquakes != null && earthquakes.size() > 0) {
+                        fragment.setupViews(earthquakes.get(0));
+                        setupMap(earthquakes.get(0));
+                    } else {
+                        fragment.clearViews();
+                    }
+                }
                 loadingSpinner.setVisibility(View.GONE);
             }
 
@@ -201,7 +305,7 @@ public class EarthquakeListActivity extends AppCompatActivity implements GoogleA
         noInternetDialog.show();
     }
 
-    private void connectToGoogleApiClient(){
+    private void connectToGoogleApiClient() {
         if(mGoogleApiClient != null) {
             showGpsPrompt = true;
             mGoogleApiClient.connect();

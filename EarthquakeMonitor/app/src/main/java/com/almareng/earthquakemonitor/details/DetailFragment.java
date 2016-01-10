@@ -1,7 +1,7 @@
 package com.almareng.earthquakemonitor.details;
 
+import android.app.Fragment;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,16 +36,29 @@ public class DetailFragment extends Fragment {
     }
 
     public void setupViews(final Earthquake earthquake) {
-        final String formattedDate = Utils.getFormattedDateTime(earthquake.getTimeAndDate(),
-                                                                getString(R.string.earthquake_detail_date_format));
-        final String formattedTime = Utils.getFormattedDateTime(earthquake.getTimeAndDate(),
-                                                                getString(R.string.earthquake_detail_time_format));
+        if (earthquake == null) {
+            clearViews();
+        } else {
+            final String formattedDate = Utils.getFormattedDateTime(earthquake.getTimeAndDate(),
+                                                                    getString(R.string.earthquake_detail_date_format));
+            final String formattedTime = Utils.getFormattedDateTime(earthquake.getTimeAndDate(),
+                                                                    getString(R.string.earthquake_detail_time_format));
 
-        magnitudeText.setText(String.valueOf(earthquake.getMagnitude()));
-        dateText.setText(formattedDate);
-        timeText.setText(formattedTime);
-        longitudeText.setText(earthquake.getLongitude());
-        latitudeText.setText(earthquake.getLatitude());
-        depthText.setText(earthquake.getDepth());
+            magnitudeText.setText(String.valueOf(earthquake.getMagnitude()));
+            dateText.setText(formattedDate);
+            timeText.setText(formattedTime);
+            longitudeText.setText(earthquake.getLongitude());
+            latitudeText.setText(earthquake.getLatitude());
+            depthText.setText(earthquake.getDepth());
+        }
+    }
+
+    public void clearViews() {
+        magnitudeText.setText(String.valueOf(""));
+        dateText.setText("");
+        timeText.setText("");
+        longitudeText.setText("");
+        latitudeText.setText("");
+        depthText.setText("");
     }
 }

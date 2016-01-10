@@ -3,7 +3,6 @@ package com.almareng.earthquakemonitor.list;
 import android.app.Fragment;
 import android.app.LoaderManager;
 import android.content.CursorLoader;
-import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -17,7 +16,6 @@ import android.widget.TextView;
 
 import com.almareng.earthquakemonitor.R;
 import com.almareng.earthquakemonitor.data.EqContract;
-import com.almareng.earthquakemonitor.details.DetailActivity;
 
 public final class EarthquakeListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     // Database Columns
@@ -41,6 +39,10 @@ public final class EarthquakeListFragment extends Fragment implements LoaderMana
             EqContract.Entry.COLUMN_EQ_DEPTH,
             EqContract.Entry.COLUMN_EQ_DISTANCE
     };
+
+    public interface EarthquakeSelectedListener {
+        void onEarthquakeSelected(final Earthquake earthquake);
+    }
 
     private EarthquakeAdapter earthquakeAdapter;
     private SwipeRefreshLayout refreshLayout;
@@ -76,10 +78,7 @@ public final class EarthquakeListFragment extends Fragment implements LoaderMana
                                                                  cursor.getString(COL_EQ_DEPTH),
                                                                  cursor.getString(COL_EQ_DISTANCE));
 
-                    final Intent detailIntent = new Intent(getActivity(), DetailActivity.class);
-
-                    detailIntent.putExtra(EarthquakeListActivity.EARTHQUAKE_KEY, earthquake);
-                    startActivity(detailIntent);
+                    ((EarthquakeSelectedListener)getActivity()).onEarthquakeSelected(earthquake);
                 }
             }
         });
