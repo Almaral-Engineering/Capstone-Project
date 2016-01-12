@@ -36,7 +36,8 @@
             android:layout_height="wrap_content"
             android:textSize="60sp"
             android:fontFamily="sans-serif-light"
-            android:textColor="@android:color/white"/>
+            android:textColor="@android:color/white"
+            android:transitionName="@string/magnitude_text_transition_name"/>
 
     </LinearLayout>
 

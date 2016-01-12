@@ -35,5 +35,6 @@
     <string name="action_share">Share Data</string>
     <string name="earthquake_list_empty_view_message">No earthquakes registered for the chosen settings</string>
     <string name="volley_fetching_error_message">Sorry, there was an error loading earthquake data, please try again later</string>
+    <string name="magnitude_text_transition_name">magnitude text</string>
 
 </resources>

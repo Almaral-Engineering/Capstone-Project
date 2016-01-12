@@ -16,7 +16,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.ShareActionProvider;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -42,7 +41,6 @@ import java.util.ArrayList;
 
 public class EarthquakeListActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, EarthquakeListFragment.EarthquakeSelectedListener {
-    public static final String EARTHQUAKE_KEY = "earthquake";
     public static final String PREFERENCE_LONGITUDE = "preference_longitude";
     public static final String PREFERENCE_LATITUDE = "preference_latitude";
     public static final String LOCATION_PREFS = "location_preference";
@@ -94,7 +92,7 @@ public class EarthquakeListActivity extends AppCompatActivity implements GoogleA
     }
 
     @Override
-    public void onEarthquakeSelected(final Earthquake earthquake) {
+    public void onEarthquakeSelected(final View view, final Earthquake earthquake) {
         if (mTwoPane) {
             selectedEarthquake = earthquake;
 
@@ -105,10 +103,7 @@ public class EarthquakeListActivity extends AppCompatActivity implements GoogleA
             fragment.setupViews(earthquake);
             setupMap(earthquake);
         } else {
-            final Intent detailIntent = new Intent(this, DetailActivity.class);
-
-            detailIntent.putExtra(EarthquakeListActivity.EARTHQUAKE_KEY, earthquake);
-            startActivity(detailIntent);
+            DetailActivity.newIntent(this, view.findViewById(R.id.earthquake_list_item_magnitude_text), earthquake);
         }
     }
 

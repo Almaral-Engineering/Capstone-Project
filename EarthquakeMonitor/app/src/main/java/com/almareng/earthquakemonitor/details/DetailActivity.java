@@ -1,20 +1,26 @@
 package com.almareng.earthquakemonitor.details;
 
-import android.content.Intent;
-import android.os.Bundle;
+import android.app.Activity;
+import android.app.ActivityOptions;
 import android.app.FragmentManager;
+import android.content.Intent;
+import android.os.Build;
+import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.ShareActionProvider;
 import android.support.v7.widget.Toolbar;
+import android.transition.Slide;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.animation.AnimationUtils;
 
 import com.almareng.earthquakemonitor.R;
 import com.almareng.earthquakemonitor.Utils;
 import com.almareng.earthquakemonitor.list.Earthquake;
-import com.almareng.earthquakemonitor.list.EarthquakeListActivity;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -23,11 +29,28 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 public class DetailActivity extends AppCompatActivity {
+    public static final String EARTHQUAKE_KEY = "earthquake";
+
     private Earthquake earthquake;
+
+    public static void newIntent(final Activity activity, final View transitionView, final Earthquake earthquake) {
+        final Intent detailIntent = new Intent(activity, DetailActivity.class);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            final ActivityOptions options = ActivityOptions
+                    .makeSceneTransitionAnimation(activity, transitionView, transitionView.getTransitionName());
+
+            detailIntent.putExtra("earthquake", earthquake);
+            activity.startActivity(detailIntent, options.toBundle());
+        } else {
+            activity.startActivity(detailIntent);
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        initActivityTransitions();
         setContentView(R.layout.activity_detail);
 
         final Toolbar detailToolbar = (Toolbar) findViewById(R.id.activity_detail_toolbar);
@@ -42,11 +65,22 @@ public class DetailActivity extends AppCompatActivity {
         }
 
         final Bundle extras = getIntent().getExtras();
-        earthquake = extras.getParcelable(EarthquakeListActivity.EARTHQUAKE_KEY);
+        earthquake = extras.getParcelable(EARTHQUAKE_KEY);
 
         setupViews();
 
         setupMap(earthquake);
+    }
+
+    private void initActivityTransitions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            final Slide transition = new Slide(Gravity.TOP);
+            transition.addTarget(R.id.fragment_detail);
+            transition.setInterpolator(AnimationUtils.loadInterpolator(this,
+                                                                       android.R.interpolator.linear_out_slow_in));
+
+            getWindow().setEnterTransition(transition);
+        }
     }
 
     private void setupViews() {

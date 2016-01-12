@@ -41,7 +41,7 @@ public final class EarthquakeListFragment extends Fragment implements LoaderMana
     };
 
     public interface EarthquakeSelectedListener {
-        void onEarthquakeSelected(final Earthquake earthquake);
+        void onEarthquakeSelected(final View view, final Earthquake earthquake);
     }
 
     private EarthquakeAdapter earthquakeAdapter;
@@ -78,7 +78,7 @@ public final class EarthquakeListFragment extends Fragment implements LoaderMana
                                                                  cursor.getString(COL_EQ_DEPTH),
                                                                  cursor.getString(COL_EQ_DISTANCE));
 
-                    ((EarthquakeSelectedListener)getActivity()).onEarthquakeSelected(earthquake);
+                    ((EarthquakeSelectedListener)getActivity()).onEarthquakeSelected(view, earthquake);
                 }
             }
         });

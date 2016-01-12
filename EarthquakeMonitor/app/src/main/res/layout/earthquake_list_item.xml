@@ -19,6 +19,7 @@
         android:textAppearance="?android:textAppearanceMedium"
         android:textColor="@android:color/black"
         android:textStyle="bold"
+        android:transitionName="@string/magnitude_text_transition_name"
         tools:text="5.0"/>
 
     <LinearLayout
