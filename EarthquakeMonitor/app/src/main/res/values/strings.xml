@@ -42,5 +42,7 @@
 
     <!-- SyncAdapter related -->
     <string name="sync_account_type">earthquakemonitor.almareng.com</string>
+    <string name="last_registered_earthquakes">Last earthquakes:</string>
+    <string name="new_earthquakes_registered">New earthquakes registered</string>
 
 </resources>

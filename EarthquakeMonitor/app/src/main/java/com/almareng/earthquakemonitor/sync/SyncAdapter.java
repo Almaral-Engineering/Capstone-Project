@@ -2,31 +2,39 @@ package com.almareng.earthquakemonitor.sync;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SyncRequest;
 import android.content.SyncResult;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
+import android.support.v4.content.ContextCompat;
 import android.widget.Toast;
 
 import com.almareng.earthquakemonitor.R;
 import com.almareng.earthquakemonitor.api.ApiClient;
 import com.almareng.earthquakemonitor.list.Earthquake;
 import com.almareng.earthquakemonitor.list.EarthquakeDataListener;
+import com.almareng.earthquakemonitor.list.EarthquakeListActivity;
 
 import java.util.ArrayList;
 
 public final class SyncAdapter extends AbstractThreadedSyncAdapter {
     // Interval at which to sync with the weather, in milliseconds.
     // 60 seconds (1 minute) * 120 = 2 hours for lower than KITKAT and 1 hour for KITKAT and upper.
-    public static final int SYNC_INTERVAL = 120;
-    public static final int SYNC_FLEXTIME = SYNC_INTERVAL/2;
+    private static final int SYNC_INTERVAL = 60 * 120;
+    private static final int SYNC_FLEXTIME = SYNC_INTERVAL/2;
+    private static final int EARTHQUAKE_NOTIFICATION_ID = 0;
+    public static final int MAX_EARTHQUAKES_TO_DISPLAY_ON_NOTIFICATION = 5;
 
     public SyncAdapter(final Context context, final boolean autoInitialize) {
         super(context, autoInitialize);
@@ -47,7 +55,9 @@ public final class SyncAdapter extends AbstractThreadedSyncAdapter {
         ApiClient.getEarthquakeData(context, postUrl, new EarthquakeDataListener() {
             @Override
             public void onResponse(final ArrayList<Earthquake> earthquakes) {
-
+                if (earthquakes != null && !earthquakes.isEmpty()) {
+                    displayNotification(earthquakes);
+                }
             }
 
             @Override
@@ -148,5 +158,60 @@ public final class SyncAdapter extends AbstractThreadedSyncAdapter {
 
     public static void initializeSyncAdapter(final Context context) {
         getSyncAccount(context);
+    }
+
+    private void displayNotification(final ArrayList<Earthquake> earthquakes) {
+        final Context context = getContext();
+        //checking the last update and notify if it' the first of the day
+        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        final String displayNotificationsKey = context.getString(R.string.display_notifications_key);
+        final String displayNotificationsDefaultString = context.getString(R.string.display_notifications_default);
+        final boolean displayNotifications = prefs.getBoolean(displayNotificationsKey,
+                                                              Boolean.parseBoolean(displayNotificationsDefaultString));
+
+        if (displayNotifications) {
+            final String title = context.getString(R.string.app_name);
+
+            final NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
+                    .setColor(ContextCompat.getColor(context, R.color.silver))
+                    .setSmallIcon(R.mipmap.ic_launcher)
+                    .setContentTitle(title)
+                    .setContentText(context.getString(R.string.new_earthquakes_registered));
+
+            final NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
+
+            inboxStyle.setBigContentTitle(context.getString(R.string.last_registered_earthquakes));
+
+            final int numberOfEarthquakesToShow;
+
+            if (earthquakes.size() < MAX_EARTHQUAKES_TO_DISPLAY_ON_NOTIFICATION) {
+                numberOfEarthquakesToShow = earthquakes.size();
+            } else {
+                numberOfEarthquakesToShow = MAX_EARTHQUAKES_TO_DISPLAY_ON_NOTIFICATION;
+            }
+
+            for (int i = 0; i < numberOfEarthquakesToShow; i++) {
+                final Earthquake earthquake = earthquakes.get(i);
+                final String contentText = earthquake.getMagnitude() + " - " + earthquake.getPlace();
+
+                inboxStyle.addLine(contentText);
+            }
+
+            builder.setStyle(inboxStyle);
+
+            final Intent intent = new Intent(context, EarthquakeListActivity.class);
+            final TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
+
+            stackBuilder.addNextIntent(intent);
+
+            final PendingIntent pendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+
+            builder.setContentIntent(pendingIntent);
+
+            final NotificationManager notificationManager =
+                    (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+            notificationManager.notify(EARTHQUAKE_NOTIFICATION_ID, builder.build());
+        }
     }
 }
