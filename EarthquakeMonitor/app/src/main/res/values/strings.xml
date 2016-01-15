@@ -37,4 +37,7 @@
     <string name="volley_fetching_error_message">Sorry, there was an error loading earthquake data, please try again later</string>
     <string name="magnitude_text_transition_name">magnitude text</string>
 
+    <!-- SyncAdapter related -->
+    <string name="sync_account_type">earthquakemonitor.almareng.com</string>
+
 </resources>

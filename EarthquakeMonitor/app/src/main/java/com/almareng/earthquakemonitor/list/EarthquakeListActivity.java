@@ -27,6 +27,7 @@ import com.almareng.earthquakemonitor.Utils;
 import com.almareng.earthquakemonitor.api.ApiClient;
 import com.almareng.earthquakemonitor.details.DetailActivity;
 import com.almareng.earthquakemonitor.details.DetailFragment;
+import com.almareng.earthquakemonitor.sync.SyncAdapter;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
@@ -89,6 +90,8 @@ public class EarthquakeListActivity extends AppCompatActivity implements GoogleA
         transaction.commit();
 
         mTwoPane = findViewById(R.id.earthquake_detail_tablet_layout) != null;
+
+        SyncAdapter.initializeSyncAdapter(this);
     }
 
     @Override
