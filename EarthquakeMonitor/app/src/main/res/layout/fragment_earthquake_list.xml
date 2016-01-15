@@ -17,8 +17,8 @@
             android:layout_height="wrap_content"
             android:divider="@android:drawable/divider_horizontal_bright"
             android:dividerHeight="@dimen/activity_earthquake_list_divider_height"
-            android:paddingLeft="@dimen/activity_earthquake_list_padding"
-            android:paddingRight="@dimen/activity_earthquake_list_padding"/>
+            android:paddingStart="@dimen/activity_earthquake_list_padding"
+            android:paddingEnd="@dimen/activity_earthquake_list_padding"/>
 
     </android.support.v4.widget.SwipeRefreshLayout>
 
