@@ -40,7 +40,7 @@ public class DetailActivity extends AppCompatActivity {
             final ActivityOptions options = ActivityOptions
                     .makeSceneTransitionAnimation(activity, transitionView, transitionView.getTransitionName());
 
-            detailIntent.putExtra("earthquake", earthquake);
+            detailIntent.putExtra(EARTHQUAKE_KEY, earthquake);
             activity.startActivity(detailIntent, options.toBundle());
         } else {
             activity.startActivity(detailIntent);
