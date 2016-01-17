@@ -3,6 +3,7 @@ package com.almareng.earthquakemonitor.widget;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Binder;
+import android.support.v4.content.ContextCompat;
 import android.widget.AdapterView;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
@@ -22,17 +23,6 @@ public final class WidgetRemoteViewsService extends RemoteViewsService {
     public static final int COL_EQ_LONGITUDE = 5;
     public static final int COL_EQ_DEPTH = 6;
     public static final int COL_EQ_DISTANCE = 7;
-
-    private static final String[] ENTRY_COLUMNS = {
-            EqContract.Entry._ID,
-            EqContract.Entry.COLUMN_EQ_MAGNITUDE,
-            EqContract.Entry.COLUMN_EQ_PLACE,
-            EqContract.Entry.COLUMN_EQ_TIME_DATE,
-            EqContract.Entry.COLUMN_EQ_LATITUDE,
-            EqContract.Entry.COLUMN_EQ_LONGITUDE,
-            EqContract.Entry.COLUMN_EQ_DEPTH,
-            EqContract.Entry.COLUMN_EQ_DISTANCE
-    };
 
     @Override
     public RemoteViewsFactory onGetViewFactory(final Intent intent) {
@@ -94,6 +84,25 @@ public final class WidgetRemoteViewsService extends RemoteViewsService {
 
             views.setTextViewText(R.id.widget_magnitude_text, String.valueOf(magnitude));
             views.setTextViewText(R.id.widget_place_text, place);
+
+            if(magnitude >= 0 && magnitude <= 3.5){
+                views.setTextColor(R.id.widget_magnitude_text, ContextCompat.getColor(getApplicationContext(),
+                                                                                      android.R.color.holo_green_dark));
+                views.setTextColor(R.id.widget_place_text, ContextCompat.getColor(getApplicationContext(),
+                                                                                      android.R.color.holo_green_dark));
+            }
+            else if(magnitude >= 6.5){
+                views.setTextColor(R.id.widget_magnitude_text, ContextCompat.getColor(getApplicationContext(),
+                                                                                      android.R.color.holo_red_dark));
+                views.setTextColor(R.id.widget_place_text, ContextCompat.getColor(getApplicationContext(),
+                                                                                  android.R.color.holo_red_dark));
+            }
+            else{
+                views.setTextColor(R.id.widget_magnitude_text, ContextCompat.getColor(getApplicationContext(),
+                                                                                      android.R.color.black));
+                views.setTextColor(R.id.widget_place_text, ContextCompat.getColor(getApplicationContext(),
+                                                                                  android.R.color.black));
+            }
 
             final Earthquake earthquake = new Earthquake(magnitude, place, timeDate, lon, lat, depth, distance);
             final Intent fillInIntent = new Intent();
