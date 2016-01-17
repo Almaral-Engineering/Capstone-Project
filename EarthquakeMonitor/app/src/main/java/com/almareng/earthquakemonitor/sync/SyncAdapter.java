@@ -33,8 +33,7 @@ public final class SyncAdapter extends AbstractThreadedSyncAdapter {
 
     // Interval at which to sync with the weather, in milliseconds.
     // 60 seconds (1 minute) * 120 = 2 hours for lower than KITKAT and 1 hour for KITKAT and upper.
-//    private static final int SYNC_INTERVAL = 60 * 120;
-    private static final int SYNC_INTERVAL = 60;
+    private static final int SYNC_INTERVAL = 60 * 120;
     private static final int SYNC_FLEXTIME = SYNC_INTERVAL/2;
     private static final int EARTHQUAKE_NOTIFICATION_ID = 0;
     public static final int MAX_EARTHQUAKES_TO_DISPLAY_ON_NOTIFICATION = 5;
