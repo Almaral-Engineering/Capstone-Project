@@ -29,9 +29,12 @@ import com.almareng.earthquakemonitor.list.EarthquakeListActivity;
 import java.util.ArrayList;
 
 public final class SyncAdapter extends AbstractThreadedSyncAdapter {
+    public static final String ACTION_DATA_UPDATED = "com.almareng.earthquakemonitor.ACTION_DATA_UPDATED";
+
     // Interval at which to sync with the weather, in milliseconds.
     // 60 seconds (1 minute) * 120 = 2 hours for lower than KITKAT and 1 hour for KITKAT and upper.
-    private static final int SYNC_INTERVAL = 60 * 120;
+//    private static final int SYNC_INTERVAL = 60 * 120;
+    private static final int SYNC_INTERVAL = 60;
     private static final int SYNC_FLEXTIME = SYNC_INTERVAL/2;
     private static final int EARTHQUAKE_NOTIFICATION_ID = 0;
     public static final int MAX_EARTHQUAKES_TO_DISPLAY_ON_NOTIFICATION = 5;
@@ -47,7 +50,6 @@ public final class SyncAdapter extends AbstractThreadedSyncAdapter {
                               final ContentProviderClient provider,
                               final SyncResult syncResult) {
         final Context context = getContext();
-
         final SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
         final String postUrl = sharedPrefs.getString(context.getString(R.string.searching_time_key),
                                                      context.getString(R.string.searching_time_default));
@@ -56,6 +58,7 @@ public final class SyncAdapter extends AbstractThreadedSyncAdapter {
             @Override
             public void onResponse(final ArrayList<Earthquake> earthquakes) {
                 if (earthquakes != null && !earthquakes.isEmpty()) {
+                    updateWidgets();
                     displayNotification(earthquakes);
                 }
             }
@@ -158,6 +161,14 @@ public final class SyncAdapter extends AbstractThreadedSyncAdapter {
 
     public static void initializeSyncAdapter(final Context context) {
         getSyncAccount(context);
+    }
+
+    private void updateWidgets() {
+        final Context context = getContext();
+        // Setting the package ensures that only components in our app will receive the broadcast
+        final Intent dataUpdatedIntent = new Intent(ACTION_DATA_UPDATED).setPackage(context.getPackageName());
+
+        context.sendBroadcast(dataUpdatedIntent);
     }
 
     private void displayNotification(final ArrayList<Earthquake> earthquakes) {

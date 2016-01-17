@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="material_teal_800">#00695c</color>
+    <color name="material_teal_500">#ff009688</color>
     <color name="silver">#bec4c8</color>
 </resources>

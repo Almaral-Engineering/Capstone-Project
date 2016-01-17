@@ -9,4 +9,9 @@
     <dimen name="fragment_detail_location_data_horizontal_padding">16dp</dimen>
     <dimen name="fragment_detail_time_date_padding_start">24dp</dimen>
     <dimen name="fragment_detail_time_date_padding_end">6dp</dimen>
+    <dimen name="widget_layout_toolbar_text_padding">16dp</dimen>
+    <dimen name="widget_default_height">180dp</dimen>
+    <dimen name="widget_min_resize_height">180dp</dimen>
+    <dimen name="widget_min_resize_width">220dp</dimen>
+    <dimen name="widget_default_width">250dp</dimen>
 </resources>
