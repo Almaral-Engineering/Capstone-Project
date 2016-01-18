@@ -6,7 +6,6 @@ import android.test.ActivityInstrumentationTestCase2;
 
 import com.almareng.earthquakemonitor.details.DetailActivity;
 import com.almareng.earthquakemonitor.list.Earthquake;
-import com.almareng.earthquakemonitor.list.EarthquakeListActivity;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
@@ -50,7 +49,7 @@ public class TestDetailActivity extends ActivityInstrumentationTestCase2<DetailA
                                                      "250");
         final Intent intent = new Intent();
 
-        intent.putExtra(EarthquakeListActivity.EARTHQUAKE_KEY, earthquake);
+        intent.putExtra(DetailActivity.EARTHQUAKE_KEY, earthquake);
         setActivityIntent(intent);
 
         injectInstrumentation(InstrumentationRegistry.getInstrumentation());
