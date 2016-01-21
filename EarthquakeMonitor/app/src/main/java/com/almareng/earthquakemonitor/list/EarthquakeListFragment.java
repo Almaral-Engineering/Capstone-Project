@@ -2,31 +2,27 @@ package com.almareng.earthquakemonitor.list;
 
 import android.app.Fragment;
 import android.app.LoaderManager;
+import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Loader;
+import android.content.res.TypedArray;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ListView;
+import android.view.ViewTreeObserver;
+import android.widget.AbsListView;
 import android.widget.TextView;
 
 import com.almareng.earthquakemonitor.R;
 import com.almareng.earthquakemonitor.data.EqContract;
 
 public final class EarthquakeListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
-    // Database Columns
-    public static final int COL_EQ_MAGNITUDE = 1;
-    public static final int COL_EQ_PLACE= 2;
-    public static final int COL_EQ_TIME_DATE = 3;
-    public static final int COL_EQ_LATITUDE = 4;
-    public static final int COL_EQ_LONGITUDE = 5;
-    public static final int COL_EQ_DEPTH = 6;
-    public static final int COL_EQ_DISTANCE = 7;
-
     private static final int EARTHQUAKE_LOADER_ID = 0;
 
     private static final String[] ENTRY_COLUMNS = {
@@ -46,6 +42,22 @@ public final class EarthquakeListFragment extends Fragment implements LoaderMana
 
     private EarthquakeAdapter earthquakeAdapter;
     private SwipeRefreshLayout refreshLayout;
+    private RecyclerView earthquakeList;
+    private boolean mUseTodayLayout;
+    private boolean mAutoSelectView;
+    private int mChoiceMode;
+
+    @Override
+    public void onInflate(final Context context, final AttributeSet attrs, final Bundle savedInstanceState) {
+        super.onInflate(context, attrs, savedInstanceState);
+
+        final TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.EarthquakeListFragment, 0, 0);
+
+        mChoiceMode = a.getInt(R.styleable.EarthquakeListFragment_android_choiceMode, AbsListView.CHOICE_MODE_NONE);
+        mAutoSelectView = a.getBoolean(R.styleable.EarthquakeListFragment_autoSelectView, false);
+
+        a.recycle();
+    }
 
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
@@ -57,31 +69,20 @@ public final class EarthquakeListFragment extends Fragment implements LoaderMana
     public void onViewCreated(final View view, final Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        final ListView earthquakeList = (ListView) view.findViewById(R.id.earthquake_list);
+        earthquakeList = (RecyclerView) view.findViewById(R.id.earthquake_recyclerview);
         final TextView emptyView = (TextView) view.findViewById(R.id.earthquake_list_empty_view);
         refreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.earthquake_list_refresher);
-        earthquakeAdapter = new EarthquakeAdapter(getActivity(), null, 0);
 
-        earthquakeList.setEmptyView(emptyView);
-        earthquakeList.setAdapter(earthquakeAdapter);
-        earthquakeList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        earthquakeList.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+        earthquakeAdapter = new EarthquakeAdapter(getActivity(), new EarthquakeAdapter.OnItemClickListener() {
             @Override
-            public void onItemClick(final AdapterView<?> parent, final View view, final int position, final long id) {
-                final Cursor cursor = earthquakeAdapter.getCursor();
-
-                if (cursor != null && cursor.moveToPosition(position)) {
-                    final Earthquake earthquake = new Earthquake(cursor.getDouble(COL_EQ_MAGNITUDE),
-                                                                 cursor.getString(COL_EQ_PLACE),
-                                                                 cursor.getString(COL_EQ_TIME_DATE),
-                                                                 cursor.getString(COL_EQ_LONGITUDE),
-                                                                 cursor.getString(COL_EQ_LATITUDE),
-                                                                 cursor.getString(COL_EQ_DEPTH),
-                                                                 cursor.getString(COL_EQ_DISTANCE));
-
-                    ((EarthquakeSelectedListener)getActivity()).onEarthquakeSelected(view, earthquake);
-                }
+            public void onClick(final Earthquake earthquake, final View view) {
+                ((EarthquakeSelectedListener)getActivity()).onEarthquakeSelected(view, earthquake);
             }
-        });
+        }, emptyView, mChoiceMode);
+
+        earthquakeList.setAdapter(earthquakeAdapter);
 
         refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -91,6 +92,12 @@ public final class EarthquakeListFragment extends Fragment implements LoaderMana
         });
 
         getLoaderManager().initLoader(EARTHQUAKE_LOADER_ID, null, this);
+
+        if (savedInstanceState != null) {
+            earthquakeAdapter.onRestoreInstanceState(savedInstanceState);
+        }
+
+        earthquakeAdapter.setUseTodayLayout(mUseTodayLayout);
     }
 
     @Override
@@ -102,10 +109,45 @@ public final class EarthquakeListFragment extends Fragment implements LoaderMana
     public void onLoadFinished(final Loader<Cursor> loader, final Cursor data) {
         earthquakeAdapter.swapCursor(data);
         refreshLayout.setRefreshing(false);
+
+        if (data.getCount() > 0 ) {
+            earthquakeList.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+                @Override
+                public boolean onPreDraw() {
+                    // Since we know we're going to get items, we keep the listener around until
+                    // we see Children.
+                    if (earthquakeList.getChildCount() > 0) {
+                        earthquakeList.getViewTreeObserver().removeOnPreDrawListener(this);
+                        int itemPosition = earthquakeAdapter.getSelectedItemPosition();
+                        if ( RecyclerView.NO_POSITION == itemPosition ) itemPosition = 0;
+                        RecyclerView.ViewHolder vh = earthquakeList.findViewHolderForAdapterPosition(itemPosition);
+                        if (null != vh && mAutoSelectView) {
+                            earthquakeAdapter.selectView( vh );
+                        }
+                        return true;
+                    }
+                    return false;
+                }
+            });
+        }
     }
 
     @Override
     public void onLoaderReset(final Loader<Cursor> loader) {
         earthquakeAdapter.swapCursor(null);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        // When tablets rotate, the currently selected list item needs to be saved.
+        earthquakeAdapter.onSaveInstanceState(outState);
+        super.onSaveInstanceState(outState);
+    }
+
+    public void setUseTodayLayout(final boolean useTodayLayout) {
+        mUseTodayLayout = useTodayLayout;
+        if (earthquakeAdapter != null) {
+            earthquakeAdapter.setUseTodayLayout(mUseTodayLayout);
+        }
     }
 }

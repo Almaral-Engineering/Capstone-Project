@@ -83,6 +83,8 @@ public class EarthquakeListActivity extends AppCompatActivity implements GoogleA
         settingsFragment = new SettingsFragment();
 
         final EarthquakeListFragment earthquakeListFragment = new EarthquakeListFragment();
+        earthquakeListFragment.setUseTodayLayout(!mTwoPane);
+
         final FragmentTransaction transaction = getFragmentManager().beginTransaction();
 
         transaction.add(R.id.main_frame_layout, earthquakeListFragment);

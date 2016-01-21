@@ -11,8 +11,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <ListView
-            android:id="@+id/earthquake_list"
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/earthquake_recyclerview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:divider="@android:drawable/divider_horizontal_bright"
