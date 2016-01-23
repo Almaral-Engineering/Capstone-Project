@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -68,6 +69,8 @@ public final class EarthquakeListFragment extends Fragment implements LoaderMana
     @Override
     public void onViewCreated(final View view, final Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        setupToolbar(view);
 
         earthquakeList = (RecyclerView) view.findViewById(R.id.earthquake_recyclerview);
         final TextView emptyView = (TextView) view.findViewById(R.id.earthquake_list_empty_view);
@@ -149,5 +152,12 @@ public final class EarthquakeListFragment extends Fragment implements LoaderMana
         if (earthquakeAdapter != null) {
             earthquakeAdapter.setUseTodayLayout(mUseTodayLayout);
         }
+    }
+
+    private void setupToolbar(final View view) {
+        final Toolbar toolbar = (Toolbar) view.findViewById(R.id.earthquake_list_fragment_toolbar);
+
+        toolbar.setTitle(getString(R.string.app_name));
+        ((EarthquakeListActivity) getActivity()).setSupportActionBar(toolbar);
     }
 }

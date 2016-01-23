@@ -15,7 +15,6 @@ import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.ShareActionProvider;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -55,11 +54,11 @@ public class EarthquakeListActivity extends AppCompatActivity implements GoogleA
     private GoogleApiClient mGoogleApiClient;
     private Location mCurrentLocation;
     private boolean showGpsPrompt = false;
-    private Toolbar toolbar;
     private ProgressBar loadingSpinner;
     private boolean mTwoPane;
     private Earthquake selectedEarthquake;
     private ShareActionProvider mShareActionProvider;
+    private boolean isSettingsShowing = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,9 +67,7 @@ public class EarthquakeListActivity extends AppCompatActivity implements GoogleA
 
         loadingSpinner = (ProgressBar) findViewById(R.id.earthquake_list_activity_loading_spinner);
 
-        setupToolbar();
         fetchEarthquakeData();
-        inflateMenu();
 
         mGoogleApiClient =  new GoogleApiClient.Builder(this)
                 .addApi(LocationServices.API)
@@ -145,11 +142,8 @@ public class EarthquakeListActivity extends AppCompatActivity implements GoogleA
 
     @Override
     public void onBackPressed() {
-        if (toolbar.getTitle().equals(getString(R.string.title_activity_settings))) {
-            toolbar.getMenu().clear();
-            toolbar.setNavigationIcon(null);
-            toolbar.inflateMenu(R.menu.menu_main);
-            toolbar.setTitle(getString(R.string.app_name));
+        if (isSettingsShowing) {
+            isSettingsShowing = false;
 
             getFragmentManager().popBackStackImmediate();
         } else {
@@ -200,7 +194,8 @@ public class EarthquakeListActivity extends AppCompatActivity implements GoogleA
             transaction.replace(R.id.main_frame_layout, settingsFragment);
             transaction.addToBackStack(null);
             transaction.commit();
-            toolbar.setTitle(getString(R.string.title_activity_settings));
+
+            isSettingsShowing = true;
 
             return true;
         }
@@ -279,13 +274,6 @@ public class EarthquakeListActivity extends AppCompatActivity implements GoogleA
         });
     }
 
-    private void setupToolbar() {
-        toolbar = (Toolbar) findViewById(R.id.earthquake_list_activity_toolbar);
-
-        toolbar.setTitle(getString(R.string.app_name));
-        setSupportActionBar(toolbar);
-    }
-
     private void showPromptActivateGPS() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
@@ -312,37 +300,37 @@ public class EarthquakeListActivity extends AppCompatActivity implements GoogleA
         }
     }
 
-    private void inflateMenu() {
-        toolbar.inflateMenu(R.menu.menu_main);
-
-        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(final MenuItem item) {
-                int id = item.getItemId();
-
-                if (id == R.id.action_settings) {
-                    final FragmentTransaction transaction = getFragmentManager().beginTransaction();
-
-                    transaction.replace(R.id.main_frame_layout, settingsFragment);
-                    transaction.addToBackStack(null);
-                    transaction.commit();
-                    toolbar.setTitle(getString(R.string.title_activity_settings));
-                    toolbar.getMenu().clear();
-                    toolbar.setNavigationIcon(R.mipmap.ic_arrow_left);
-                    toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(final View v) {
-                            onBackPressed();
-                        }
-                    });
-
-                    return true;
-                }
-
-                return true;
-            }
-        });
-    }
+//    private void inflateMenu() {
+//        toolbar.inflateMenu(R.menu.menu_main);
+//
+//        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+//            @Override
+//            public boolean onMenuItemClick(final MenuItem item) {
+//                int id = item.getItemId();
+//
+//                if (id == R.id.action_settings) {
+//                    final FragmentTransaction transaction = getFragmentManager().beginTransaction();
+//
+//                    transaction.replace(R.id.main_frame_layout, settingsFragment);
+//                    transaction.addToBackStack(null);
+//                    transaction.commit();
+//                    toolbar.setTitle(getString(R.string.title_activity_settings));
+//                    toolbar.getMenu().clear();
+//                    toolbar.setNavigationIcon(R.mipmap.ic_arrow_left);
+//                    toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+//                        @Override
+//                        public void onClick(final View v) {
+//                            onBackPressed();
+//                        }
+//                    });
+//
+//                    return true;
+//                }
+//
+//                return true;
+//            }
+//        });
+//    }
 
     private boolean isLocationNull(){
         return mCurrentLocation == null;
