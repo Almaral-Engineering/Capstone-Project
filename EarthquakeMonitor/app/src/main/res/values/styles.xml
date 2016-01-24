@@ -5,4 +5,9 @@
         <item name="colorPrimaryDark">@color/material_teal_800</item>
     </style>
 
+    <style name="EarthquakeListFragmentExpandedToolbarTitle">
+        <item name="titleTextColor">@android:color/white</item>
+        <item name="android:textSize">28sp</item>
+    </style>
+
 </resources>

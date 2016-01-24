@@ -1,44 +1,73 @@
-<RelativeLayout
+<android.support.design.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.almareng.earthquakemonitor.list.EarthquakeListFragment">
+    android:layout_height="match_parent">
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/earthquake_list_fragment_toolbar"
+    <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="?attr/colorPrimary"
-        android:minHeight="?attr/actionBarSize"
-        android:layout_alignParentTop="true"
-        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"/>
+        android:layout_height="@dimen/earthquake_list_fragment_app_bar_layout_expanded_height"
+        android:elevation="@dimen/earthquake_list_fragment_toolbar_elevation"
+        android:minHeight="?actionBarSize">
 
-    <android.support.v4.widget.SwipeRefreshLayout
-        android:id="@+id/earthquake_list_refresher"
+        <android.support.design.widget.CollapsingToolbarLayout
+            android:id="@+id/collapsing_toolbar_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fitsSystemWindows="true"
+            android:minHeight="?attr/actionBarSize"
+            app:contentScrim="?attr/colorPrimary"
+            app:expandedTitleMarginStart="@dimen/earthquake_list_fragment_expanded_title_margin_start"
+            app:expandedTitleTextAppearance="@style/EarthquakeListFragmentExpandedToolbarTitle"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:fitsSystemWindows="true"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/earthquake_crack"
+                    app:layout_collapseMode="parallax"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/earthquake_list_fragment_image_gradient"/>
+
+            </FrameLayout>
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/earthquake_list_fragment_toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:minHeight="?attr/actionBarSize"
+                app:layout_collapseMode="pin"
+                app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"/>
+
+        </android.support.design.widget.CollapsingToolbarLayout>
+
+    </android.support.design.widget.AppBarLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/earthquake_recyclerview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/earthquake_list_fragment_toolbar">
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/earthquake_recyclerview"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:divider="@android:drawable/divider_horizontal_bright"
-            android:dividerHeight="@dimen/activity_earthquake_list_divider_height"
-            android:paddingStart="@dimen/activity_earthquake_list_padding"
-            android:paddingEnd="@dimen/activity_earthquake_list_padding"/>
-
-    </android.support.v4.widget.SwipeRefreshLayout>
+        android:divider="@android:drawable/divider_horizontal_bright"
+        android:dividerHeight="@dimen/activity_earthquake_list_divider_height"
+        android:paddingEnd="@dimen/activity_earthquake_list_padding"
+        android:paddingStart="@dimen/activity_earthquake_list_padding"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
     <TextView
         android:id="@+id/earthquake_list_empty_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/earthquake_list_empty_view_message"
+        android:layout_height="match_parent"
         android:gravity="center"
-        android:textAppearance="@style/TextAppearance.AppCompat.Title"
-        android:layout_centerInParent="true"/>
+        android:text="@string/earthquake_list_empty_view_message"
+        android:textAppearance="@style/TextAppearance.AppCompat.Title"/>
 
-</RelativeLayout>
+</android.support.design.widget.CoordinatorLayout>

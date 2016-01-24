@@ -8,7 +8,8 @@ import android.content.Loader;
 import android.content.res.TypedArray;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -42,7 +43,6 @@ public final class EarthquakeListFragment extends Fragment implements LoaderMana
     }
 
     private EarthquakeAdapter earthquakeAdapter;
-    private SwipeRefreshLayout refreshLayout;
     private RecyclerView earthquakeList;
     private boolean mUseTodayLayout;
     private boolean mAutoSelectView;
@@ -70,29 +70,31 @@ public final class EarthquakeListFragment extends Fragment implements LoaderMana
     public void onViewCreated(final View view, final Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        setupToolbar(view);
+        final Toolbar toolbar = (Toolbar) view.findViewById(R.id.earthquake_list_fragment_toolbar);
+
+        ((EarthquakeListActivity) getActivity()).setSupportActionBar(toolbar);
+
+        final CollapsingToolbarLayout collapsingToolbarLayout =
+                (CollapsingToolbarLayout) view.findViewById(R.id.collapsing_toolbar_layout);
+        final Context context = getActivity().getApplicationContext();
+
+        collapsingToolbarLayout.setTitle(getString(R.string.app_name));
+        collapsingToolbarLayout.setExpandedTitleColor(ContextCompat.getColor(context, android.R.color.white));
+        collapsingToolbarLayout.setCollapsedTitleTextColor(ContextCompat.getColor(context, android.R.color.white));
 
         earthquakeList = (RecyclerView) view.findViewById(R.id.earthquake_recyclerview);
         final TextView emptyView = (TextView) view.findViewById(R.id.earthquake_list_empty_view);
-        refreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.earthquake_list_refresher);
 
-        earthquakeList.setLayoutManager(new LinearLayoutManager(getActivity()));
+        earthquakeList.setLayoutManager(new LinearLayoutManager(context));
 
-        earthquakeAdapter = new EarthquakeAdapter(getActivity(), new EarthquakeAdapter.OnItemClickListener() {
+        earthquakeAdapter = new EarthquakeAdapter(context, new EarthquakeAdapter.OnItemClickListener() {
             @Override
             public void onClick(final Earthquake earthquake, final View view) {
-                ((EarthquakeSelectedListener)getActivity()).onEarthquakeSelected(view, earthquake);
+                ((EarthquakeSelectedListener) getActivity()).onEarthquakeSelected(view, earthquake);
             }
         }, emptyView, mChoiceMode);
 
         earthquakeList.setAdapter(earthquakeAdapter);
-
-        refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                getLoaderManager().restartLoader(EARTHQUAKE_LOADER_ID, null, EarthquakeListFragment.this);
-            }
-        });
 
         getLoaderManager().initLoader(EARTHQUAKE_LOADER_ID, null, this);
 
@@ -111,7 +113,6 @@ public final class EarthquakeListFragment extends Fragment implements LoaderMana
     @Override
     public void onLoadFinished(final Loader<Cursor> loader, final Cursor data) {
         earthquakeAdapter.swapCursor(data);
-        refreshLayout.setRefreshing(false);
 
         if (data.getCount() > 0 ) {
             earthquakeList.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
@@ -152,12 +153,5 @@ public final class EarthquakeListFragment extends Fragment implements LoaderMana
         if (earthquakeAdapter != null) {
             earthquakeAdapter.setUseTodayLayout(mUseTodayLayout);
         }
-    }
-
-    private void setupToolbar(final View view) {
-        final Toolbar toolbar = (Toolbar) view.findViewById(R.id.earthquake_list_fragment_toolbar);
-
-        toolbar.setTitle(getString(R.string.app_name));
-        ((EarthquakeListActivity) getActivity()).setSupportActionBar(toolbar);
     }
 }
